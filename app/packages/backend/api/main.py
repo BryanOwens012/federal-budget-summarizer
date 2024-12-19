@@ -1,8 +1,24 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import products
+from contextlib import asynccontextmanager
+from querier import engine
+from sqlalchemy import text
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # Startup: Test database connection before the application starts accepting requests
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        print("Successfully connected to the database!")
+    except Exception as e:
+        print(f"Failed to connect to the database: {str(e)}")
+        raise
+    
+    yield  # This line separates startup and shutdown logic
+
+app = FastAPI(lifespan=lifespan)
 
 # CORS middleware setup
 app.add_middleware(

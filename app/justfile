@@ -1,12 +1,15 @@
 set dotenv-load
 
-docker-up:
+up-api:
+  docker-compose build --no-cache api && docker-compose --env-file ./.env up api -d
+
+up:
   docker-compose build --no-cache && docker-compose --env-file ./.env up -d
 
-docker-down:
+down:
   docker-compose down
 
-docker-prune:
+prune:
   docker system prune --all --force --volumes
 
 fe-up:
@@ -22,7 +25,7 @@ migrate-create:
   cd packages/backend/db && migrate create -ext sql -dir migrations
 
 migrate-up:
-  cd packages/backend/db && migrate -database $POSTGRES_DB_URL -path migrations up
+  cd packages/backend/db && migrate -database $POSTGRES_DB_URL_LOCAL -path migrations up
 
 migrate-down:
-  cd packages/backend/db && migrate -database $POSTGRES_DB_URL -path migrations down
+  cd packages/backend/db && migrate -database $POSTGRES_DB_URL_LOCAL -path migrations down
