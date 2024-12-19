@@ -1,18 +1,15 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
+import { ListProductsRow } from "@/db/products_sql";
 
-type Product = {
-  id: string;
-  name: string;
-  priceCents: number;
+type ProductsResponse = {
+  products: ListProductsRow[];
 };
 
-const fetchProducts = async () => {
+const fetchProducts = async (): Promise<ProductsResponse> => {
   try {
-    // In development, we'll use an environment variable to handle different environments
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
     const response = await fetch(`${API_URL}/products`, {
       method: "GET",
       headers: {
@@ -31,11 +28,16 @@ const fetchProducts = async () => {
   }
 };
 
-const ProductItem: React.FC<{ products: Product[] }> = ({ products }) => {
+type ProductItemProps = {
+  products: ListProductsRow[];
+};
+
+const ProductItem: React.FC<ProductItemProps> = ({ products }) => {
   return (
     <div className="flex flex-col gap-y-2 w-full items-center">
       {products.map((product) => (
         <div
+          key={product.id} // Add a key prop for React list rendering
           className={classNames(
             "flex items-center justify-between w-1/2 p-4 my-4 bg-white shadow-lg rounded-lg"
           )}
@@ -44,7 +46,12 @@ const ProductItem: React.FC<{ products: Product[] }> = ({ products }) => {
             <h2 className={classNames("text-xl font-bold text-blue-600")}>
               {product.name}
             </h2>
-            <p className="text-gray-500">${product.priceCents / 100}</p>
+            <p className="text-gray-500">
+              $
+              {product.priceCents == null
+                ? "-"
+                : Number(product.priceCents) / 100}
+            </p>
           </div>
           <button
             className={classNames(
@@ -61,7 +68,8 @@ const ProductItem: React.FC<{ products: Product[] }> = ({ products }) => {
 };
 
 const ProductsPage: React.FC = () => {
-  const { data, isLoading, error } = useQuery<{ products: Product[] }>({
+  // Update the query to use the correct response type
+  const { data, isLoading, error } = useQuery<ProductsResponse>({
     queryKey: ["products"],
     queryFn: fetchProducts,
   });

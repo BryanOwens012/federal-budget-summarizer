@@ -1,12 +1,11 @@
 from fastapi import APIRouter
-from db.models import ProductList, Product
+from db.models import Product
+from typing import List
 
 router = APIRouter()
 
-@router.get("", response_model=ProductList)
+@router.get("", response_model=List[Product])
 async def read_products():
-    return ProductList(
-        products=[
-            Product(id="1", name="Apple", priceCents=123)
-        ]
-    )
+    return [
+        Product(id="1", name="Apple", priceCents=123),
+    ]
