@@ -1,0 +1,20 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "migrate_create": "cd packages/backend/db && migrate create -ext sql -dir migrations",
+    "migrate_up": "cd packages/backend/db && migrate -database \"postgres://user:password@localhost:5432/mydatabase?sslmode=disable\" -path migrations up",
+    "migrate_down": "cd packages/backend/db && migrate -database \"postgres://user:password@localhost:5432/mydatabase?sslmode=disable\" -path migrations down",
+    "sqlc_generate": "cd packages/backend && sqlc generate",
+    "be_up": "cd packages/backend/internal && fastapi dev main.py",
+    "fe_up": "cd packages/frontend && next dev",
+    "docker_up": "cd packages/backend && docker-compose up -d",
+    "docker_down": "cd packages/backend && docker-compose down"
+  }
+}
