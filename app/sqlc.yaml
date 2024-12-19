@@ -18,7 +18,7 @@ sql:
         options:
           package: db
           emit_json_tags: true
-          json_tags_case_style: camel
+          json_tags_case_style: none
           emit_pydantic_models: true
           pydantic_version: 2
           base_model_path: pydantic.BaseModel
@@ -31,7 +31,11 @@ sql:
         plugin: ts
         options:
           runtime: node
+          emit_json_tags: true
+          json_tags_case_style: none
           indent_spaces: 2
           type_only: true
           emit_exact_types: true
+          # This fixes the issue where numbers are being read as strings
+          experimental_new_types: true
           driver: postgres

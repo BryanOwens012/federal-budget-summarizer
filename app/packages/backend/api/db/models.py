@@ -9,6 +9,6 @@ from typing import Optional
 class Product(pydantic.BaseModel):
     id: int
     name: str
-    price_cents: Optional[int]
-    created_at: Optional[datetime.datetime]
-    updated_at: Optional[datetime.datetime]
+    pricecents: Optional[int]
+    createdat: Optional[datetime.datetime]
+    updatedat: Optional[datetime.datetime]

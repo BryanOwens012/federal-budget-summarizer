@@ -10,6 +10,7 @@ type ProductsResponse = {
 const fetchProducts = async (): Promise<ProductsResponse> => {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
     const response = await fetch(`${API_URL}/products`, {
       method: "GET",
       headers: {
@@ -21,7 +22,7 @@ const fetchProducts = async (): Promise<ProductsResponse> => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    return response.json();
   } catch (error) {
     console.error("Error fetching products:", error);
     throw error;
@@ -47,10 +48,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ products }) => {
               {product.name}
             </h2>
             <p className="text-gray-500">
-              $
-              {product.priceCents == null
-                ? "-"
-                : Number(product.priceCents) / 100}
+              {product.pricecents == null ? "-" : product.pricecents / 100}
             </p>
           </div>
           <button

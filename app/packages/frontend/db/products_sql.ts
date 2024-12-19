@@ -1,29 +1,29 @@
 import { Sql } from "postgres";
 
 export const listProductsQuery = `-- name: ListProducts :many
-SELECT id, name, price_cents, created_at, updated_at
+SELECT id, name, pricecents, createdat, updatedat
 FROM products`;
 
 export interface ListProductsRow {
     id: number;
     name: string;
-    priceCents: string | null;
-    createdAt: Date | null;
-    updatedAt: Date | null;
+    pricecents: number | null;
+    createdat: Date | null;
+    updatedat: Date | null;
 }
 
 export async function listProducts(sql: Sql): Promise<ListProductsRow[]> {
     return (await sql.unsafe(listProductsQuery, []).values()).map(row => ({
         id: row[0],
         name: row[1],
-        priceCents: row[2],
-        createdAt: row[3],
-        updatedAt: row[4]
+        pricecents: row[2],
+        createdat: row[3],
+        updatedat: row[4]
     }));
 }
 
 export const getProductQuery = `-- name: GetProduct :one
-SELECT id, name, price_cents, created_at, updated_at
+SELECT id, name, pricecents, createdat, updatedat
 FROM products
 WHERE id = $1`;
 
@@ -34,9 +34,9 @@ export interface GetProductArgs {
 export interface GetProductRow {
     id: number;
     name: string;
-    priceCents: string | null;
-    createdAt: Date | null;
-    updatedAt: Date | null;
+    pricecents: number | null;
+    createdat: Date | null;
+    updatedat: Date | null;
 }
 
 export async function getProduct(sql: Sql, args: GetProductArgs): Promise<GetProductRow | null> {
@@ -48,32 +48,32 @@ export async function getProduct(sql: Sql, args: GetProductArgs): Promise<GetPro
     return {
         id: row[0],
         name: row[1],
-        priceCents: row[2],
-        createdAt: row[3],
-        updatedAt: row[4]
+        pricecents: row[2],
+        createdat: row[3],
+        updatedat: row[4]
     };
 }
 
 export const createProductQuery = `-- name: CreateProduct :one
-INSERT INTO products (name, price_cents)
+INSERT INTO products (name, pricecents)
 VALUES ($1, $2)
-RETURNING id, name, price_cents, created_at, updated_at`;
+RETURNING id, name, pricecents, createdat, updatedat`;
 
 export interface CreateProductArgs {
     name: string;
-    priceCents: string | null;
+    pricecents: number | null;
 }
 
 export interface CreateProductRow {
     id: number;
     name: string;
-    priceCents: string | null;
-    createdAt: Date | null;
-    updatedAt: Date | null;
+    pricecents: number | null;
+    createdat: Date | null;
+    updatedat: Date | null;
 }
 
 export async function createProduct(sql: Sql, args: CreateProductArgs): Promise<CreateProductRow | null> {
-    const rows = await sql.unsafe(createProductQuery, [args.name, args.priceCents]).values();
+    const rows = await sql.unsafe(createProductQuery, [args.name, args.pricecents]).values();
     if (rows.length !== 1) {
         return null;
     }
@@ -81,9 +81,9 @@ export async function createProduct(sql: Sql, args: CreateProductArgs): Promise<
     return {
         id: row[0],
         name: row[1],
-        priceCents: row[2],
-        createdAt: row[3],
-        updatedAt: row[4]
+        pricecents: row[2],
+        createdat: row[3],
+        updatedat: row[4]
     };
 }
 

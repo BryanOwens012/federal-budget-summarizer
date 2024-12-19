@@ -10,21 +10,21 @@ from db import models
 
 
 CREATE_PRODUCT = """-- name: create_product \\:one
-INSERT INTO products (name, price_cents)
+INSERT INTO products (name, pricecents)
 VALUES (:p1, :p2)
-RETURNING id, name, price_cents, created_at, updated_at
+RETURNING id, name, pricecents, createdat, updatedat
 """
 
 
 GET_PRODUCT = """-- name: get_product \\:one
-SELECT id, name, price_cents, created_at, updated_at
+SELECT id, name, pricecents, createdat, updatedat
 FROM products
 WHERE id = :p1
 """
 
 
 LIST_PRODUCTS = """-- name: list_products \\:many
-SELECT id, name, price_cents, created_at, updated_at
+SELECT id, name, pricecents, createdat, updatedat
 FROM products
 """
 
@@ -33,16 +33,16 @@ class Querier:
     def __init__(self, conn: sqlalchemy.engine.Connection):
         self._conn = conn
 
-    def create_product(self, *, name: str, price_cents: Optional[int]) -> Optional[models.Product]:
-        row = self._conn.execute(sqlalchemy.text(CREATE_PRODUCT), {"p1": name, "p2": price_cents}).first()
+    def create_product(self, *, name: str, pricecents: Optional[int]) -> Optional[models.Product]:
+        row = self._conn.execute(sqlalchemy.text(CREATE_PRODUCT), {"p1": name, "p2": pricecents}).first()
         if row is None:
             return None
         return models.Product(
             id=row[0],
             name=row[1],
-            price_cents=row[2],
-            created_at=row[3],
-            updated_at=row[4],
+            pricecents=row[2],
+            createdat=row[3],
+            updatedat=row[4],
         )
 
     def get_product(self, *, id: int) -> Optional[models.Product]:
@@ -52,9 +52,9 @@ class Querier:
         return models.Product(
             id=row[0],
             name=row[1],
-            price_cents=row[2],
-            created_at=row[3],
-            updated_at=row[4],
+            pricecents=row[2],
+            createdat=row[3],
+            updatedat=row[4],
         )
 
     def list_products(self) -> Iterator[models.Product]:
@@ -63,7 +63,7 @@ class Querier:
             yield models.Product(
                 id=row[0],
                 name=row[1],
-                price_cents=row[2],
-                created_at=row[3],
-                updated_at=row[4],
+                pricecents=row[2],
+                createdat=row[3],
+                updatedat=row[4],
             )
