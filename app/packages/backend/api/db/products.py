@@ -3,7 +3,6 @@
 #   sqlc v1.27.0
 # source: products.sql
 from typing import Optional
-import uuid
 
 import sqlalchemy
 

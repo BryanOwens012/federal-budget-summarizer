@@ -16,7 +16,7 @@ be-up:
   cd packages/backend/api && fastapi dev main.py
 
 sqlc-gen:
-  cd packages/backend && sqlc generate
+  sqlc generate
 
 migrate-create:
   cd packages/backend/db && migrate create -ext sql -dir migrations

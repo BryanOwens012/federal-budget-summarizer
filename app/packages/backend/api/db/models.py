@@ -4,12 +4,11 @@
 import datetime
 import pydantic
 from typing import Optional
-import uuid
 
 
 class Product(pydantic.BaseModel):
-    id: uuid.UUID
+    id: int
     name: str
-    price_cents: int
+    price_cents: Optional[int]
     created_at: Optional[datetime.datetime]
     updated_at: Optional[datetime.datetime]
