@@ -1,27 +1,34 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
-import { UUID } from "crypto";
 
 type Product = {
-  id: UUID;
+  id: string;
   name: string;
   priceCents: number;
-  createdAt: string;
-  updatedAt: string;
 };
 
-const fetchProducts = async (): Promise<Product[]> => {
-  const apiUrl = process.env.API_URL;
-  if (!apiUrl) {
-    throw new Error("API_URL environment variable is not set");
-  }
+const fetchProducts = async () => {
+  try {
+    // In development, we'll use an environment variable to handle different environments
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  const response = await fetch(apiUrl);
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+    const response = await fetch(`${API_URL}/products`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
   }
-  return response.json();
 };
 
 const ProductItem: React.FC<{ products: Product[] }> = ({ products }) => {
@@ -54,7 +61,7 @@ const ProductItem: React.FC<{ products: Product[] }> = ({ products }) => {
 };
 
 const ProductsPage: React.FC = () => {
-  const { data, isLoading, error } = useQuery<Product[]>({
+  const { data, isLoading, error } = useQuery<{ products: Product[] }>({
     queryKey: ["products"],
     queryFn: fetchProducts,
   });
@@ -74,7 +81,11 @@ const ProductsPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <h1 className="text-4xl font-bold text-blue-600 mb-8">Our Products</h1>
-      {data ? <ProductItem products={data} /> : <div>No product found</div>}
+      {data ? (
+        <ProductItem products={data.products} />
+      ) : (
+        <div>No product found</div>
+      )}
     </div>
   );
 };

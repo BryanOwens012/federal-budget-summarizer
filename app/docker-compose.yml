@@ -10,6 +10,10 @@ services:
       - "8000:8000"  # Map FastAPI's port
     environment:
       - DATABASE_URL=${POSTGRES_DB_URL}
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
+      - NEXT_PUBLIC_API_URL=http://backend:8000 
+    networks:
+      - app-network
     depends_on:
       - postgres  # Ensure the database is ready before backend starts
     volumes:
@@ -41,6 +45,8 @@ services:
       - "3000:3000"  # Map Next.js's port
     environment:
       - API_URL=http://localhost:8000
+    networks:
+      - app-network
     depends_on:
       - api  # Ensure the backend is ready before frontend starts
       - postgres
@@ -49,3 +55,7 @@ services:
 
 volumes:
   postgres-data:
+
+networks:
+  app-network:
+    driver: bridge
