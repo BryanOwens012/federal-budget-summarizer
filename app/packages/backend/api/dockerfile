@@ -17,4 +17,4 @@ EXPOSE 8000
 
 # Command to run the application
 # Note: We specify the host and port to make it accessible outside container
-CMD ["uvicorn", "main.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
