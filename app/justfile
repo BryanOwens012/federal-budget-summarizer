@@ -1,3 +1,5 @@
+set dotenv-load
+
 docker-up:
   docker-compose build --no-cache && docker-compose --env-file ./.env up -d
 
@@ -20,7 +22,7 @@ migrate-create:
   cd packages/backend/db && migrate create -ext sql -dir migrations
 
 migrate-up:
-  cd packages/backend/db && migrate -database \"postgres://user:password@localhost:5432/mydatabase?sslmode=disable\" -path migrations up
+  cd packages/backend/db && migrate -database $POSTGRES_DB_URL -path migrations up
 
 migrate-down:
-  cd packages/backend/db && migrate -database \"postgres://user:password@localhost:5432/mydatabase?sslmode=disable\" -path migrations down
+  cd packages/backend/db && migrate -database $POSTGRES_DB_URL -path migrations down
