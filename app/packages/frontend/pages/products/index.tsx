@@ -48,7 +48,9 @@ const ProductItem: React.FC<ProductItemProps> = ({ products }) => {
               {product.name}
             </h2>
             <p className="text-gray-500">
-              {product.pricecents == null ? "-" : product.pricecents / 100}
+              {product.pricecents == null
+                ? "-"
+                : "$" + product.pricecents / 100}
             </p>
           </div>
           <button
