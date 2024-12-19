@@ -9,22 +9,8 @@ COPY . .
 # Install dependencies for all workspaces
 RUN yarn install
 
-# Build the frontend workspace
-RUN yarn run build
-
 # Stage 2: Serve the application
-FROM node:18-alpine
-
-WORKDIR /frontend
-
-# Copy the built app and production dependencies
-COPY --from=builder /frontend/.next ./
-COPY --from=builder /frontend/pages ./
-COPY --from=builder /frontend/styles ./
-COPY --from=builder /frontend/package.json ./
-
-# Install only production dependencies
-RUN yarn install --production
 
 EXPOSE 3000
-CMD ["yarn", "run", "start"]
+
+CMD ["yarn", "run", "dev"]
