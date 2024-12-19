@@ -9,6 +9,6 @@ sql:
     engine: "postgresql"
     codegen:
         package: "db"
-        out: "internal/db"
+        out: "api/db"
         emit_json_tags: true
         json_tags_case_style: "camel"

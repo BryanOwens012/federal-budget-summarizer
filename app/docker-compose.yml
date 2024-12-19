@@ -1,0 +1,51 @@
+## docker-compose down
+## docker-compose up -d
+
+services:
+  api:
+    build:
+      context: ./packages/backend/api
+      dockerfile: dockerfile
+    ports:
+      - "8000:8000"  # Map FastAPI's port
+    environment:
+      - DATABASE_URL=${POSTGRES_DB_URL}
+    depends_on:
+      - postgres  # Ensure the database is ready before backend starts
+    volumes:
+      - .:/api
+
+  postgres:
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      interval: 10s
+      retries: 5
+    build:
+      context: ./packages/backend/db
+      dockerfile: dockerfile
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  frontend:
+    build:
+      context: ./packages/frontend
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"  # Map Next.js's port
+    environment:
+      - API_URL=http://localhost:8000
+    depends_on:
+      - api  # Ensure the backend is ready before frontend starts
+      - postgres
+    volumes:
+      - .:/frontend
+
+volumes:
+  postgres-data:
