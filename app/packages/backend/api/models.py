@@ -1,10 +1,9 @@
+import dataclasses
+import datetime
+from typing import Optional, List
+import uuid
 from pydantic import BaseModel
-from typing import List
-
-class Product(BaseModel):
-    id: str
-    name: str
-    priceCents: int
+from db.models import Product
 
 class ProductList(BaseModel):
     products: List[Product]
