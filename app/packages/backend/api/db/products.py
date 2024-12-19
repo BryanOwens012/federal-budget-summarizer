@@ -2,7 +2,7 @@
 # versions:
 #   sqlc v1.27.0
 # source: products.sql
-from typing import Optional
+from typing import Iterator, Optional
 
 import sqlalchemy
 
@@ -27,3 +27,43 @@ LIST_PRODUCTS = """-- name: list_products \\:many
 SELECT id, name, price_cents, created_at, updated_at
 FROM products
 """
+
+
+class Querier:
+    def __init__(self, conn: sqlalchemy.engine.Connection):
+        self._conn = conn
+
+    def create_product(self, *, name: str, price_cents: Optional[int]) -> Optional[models.Product]:
+        row = self._conn.execute(sqlalchemy.text(CREATE_PRODUCT), {"p1": name, "p2": price_cents}).first()
+        if row is None:
+            return None
+        return models.Product(
+            id=row[0],
+            name=row[1],
+            price_cents=row[2],
+            created_at=row[3],
+            updated_at=row[4],
+        )
+
+    def get_product(self, *, id: int) -> Optional[models.Product]:
+        row = self._conn.execute(sqlalchemy.text(GET_PRODUCT), {"p1": id}).first()
+        if row is None:
+            return None
+        return models.Product(
+            id=row[0],
+            name=row[1],
+            price_cents=row[2],
+            created_at=row[3],
+            updated_at=row[4],
+        )
+
+    def list_products(self) -> Iterator[models.Product]:
+        result = self._conn.execute(sqlalchemy.text(LIST_PRODUCTS))
+        for row in result:
+            yield models.Product(
+                id=row[0],
+                name=row[1],
+                price_cents=row[2],
+                created_at=row[3],
+                updated_at=row[4],
+            )
