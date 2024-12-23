@@ -3,17 +3,17 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine
 
 # Get the database URL from environment variables
-DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Parse the URL parts
 try:
     # Split into credentials and host parts
-    auth, rest = DATABASE_URL.split('@')
+    auth, rest = DATABASE_URL.split("@")
     # Split host part into host and database
-    host, db_name = rest.split('/')
-    print(f'Attempting to connect to database: {db_name.split('?')[0]}')  # Remove query params
+    host, db_name = rest.split("/")
+    print(f"Attempting to connect to database: {db_name.split("?")[0]}")  # Remove query params
 except Exception as e:
-    print(f'Error parsing DATABASE_URL: {e}')
+    print(f"Error parsing DATABASE_URL: {e}")
 
 # Create the SQLAlchemy engine - this is our connection pool manager
 engine = create_engine(
@@ -27,10 +27,10 @@ engine = create_engine(
 # Create a context manager for database connections
 @contextmanager
 def get_conn():
-    '''
+    """
     Creates a context manager that provides a database connection.
     Using a context manager ensures the connection is always returned to the pool.
-    '''
+    """
     # Get a connection from the pool
     with engine.connect() as conn:
         # Start a transaction
