@@ -10,7 +10,7 @@ router = APIRouter()
 class ProductList(pydantic.BaseModel):
     products: List[Product]
 
-@router.get("", response_model=ProductList)
+@router.get('', response_model=ProductList)
 async def list_products():
     with get_conn() as conn:
         q = db.products.Querier(conn)
