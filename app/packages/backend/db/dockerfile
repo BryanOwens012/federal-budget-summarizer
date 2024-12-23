@@ -6,11 +6,6 @@ RUN mkdir -p /docker-entrypoint-initdb.d/migrations \
     && mkdir -p /var/log \
     && chown postgres:postgres /var/log
 
-# Set environment variables
-ENV POSTGRES_DB=mydatabase
-ENV POSTGRES_USER=user
-ENV POSTGRES_PASSWORD=password
-
 # Copy migrations and seeds first
 COPY ./migrations/ /docker-entrypoint-initdb.d/migrations/
 COPY ./seeds/ /docker-entrypoint-initdb.d/seeds/
