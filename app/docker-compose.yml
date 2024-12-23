@@ -18,6 +18,7 @@ services:
       postgres:
         condition: service_healthy # Ensure the database is ready before backend starts
     volumes:
+      # Mount the source code for hot reloading
       - .:/api
 
   postgres:
@@ -55,10 +56,12 @@ services:
       - api  # Ensure the backend is ready before frontend starts
       - postgres
     volumes:
-      # Add this for hot reloading
-      - ./packages/frontend:/frontend
-      # Prevent node_modules from being overwritten by the volume
-      - /frontend/node_modules
+      # Mount source code for hot reloading, but keep build files intact
+      - ./.next:/src/.next
+      - ./db:/src/db
+      - ./pages:/src/pages
+      - ./public:/src/public
+      - ./styles:/src/styles
 
 volumes:
   postgres-data:
