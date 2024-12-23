@@ -6,6 +6,12 @@ up-api:
 down-api:
   docker-compose down -v api
 
+up-frontend:
+  docker-compose build --no-cache frontend && docker-compose --env-file ./.env up frontend -d
+
+down-frontend:
+  docker-compose down -v frontend
+
 up-postgres:
   docker-compose build --no-cache postgres && docker-compose --env-file ./.env up postgres -d
 

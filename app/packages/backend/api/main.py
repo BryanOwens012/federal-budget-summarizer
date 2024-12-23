@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import products
 from contextlib import asynccontextmanager
 from querier import engine
 from sqlalchemy import text
+
+import routes.products
+import routes.ai
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -34,8 +36,9 @@ app.add_middleware(
     allow_credentials=False,
 )
 
-# Include the router
-app.include_router(products.router, prefix="/v1/products")
+# Include the routers
+app.include_router(routes.products.router, prefix="/v1/products")
+app.include_router(routes.ai.router, prefix="/v1/ai")
 
 if __name__ == "__main__":
     import uvicorn

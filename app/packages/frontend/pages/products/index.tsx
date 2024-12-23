@@ -2,9 +2,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { ListProductsRow } from "@/db/products_sql";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || "v1";
+import { apiURL, apiVersion } from "../_app";
 
 type ProductsResponse = {
   products: ListProductsRow[];
@@ -12,7 +10,7 @@ type ProductsResponse = {
 
 const fetchProducts = async (): Promise<ProductsResponse> => {
   try {
-    const response = await fetch(`${API_URL}/${API_VERSION}/products`, {
+    const response = await fetch(`${apiURL}/${apiVersion}/products`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

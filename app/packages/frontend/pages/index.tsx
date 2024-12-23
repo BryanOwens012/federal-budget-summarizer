@@ -1,11 +1,8 @@
 import React from "react";
+import CRSummary from "./(cr-summary)/CRSummary";
 
 const Home: React.FC = () => {
-  return (
-    <div className="flex items-center justify-center h-screen bg-gray-50">
-      <h1 className="text-4xl font-bold text-blue-600">Bryan's Next.js App</h1>
-    </div>
-  );
+  return <CRSummary />;
 };
 
 export default Home;

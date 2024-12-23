@@ -11,7 +11,8 @@ services:
     environment:
       - DATABASE_URL=${POSTGRES_DB_URL}
       - CORS_ORIGINS=http://localhost:3000,http://frontend:3000,example-nextjs-fastapi-production.up.railway.app
-      - NEXT_PUBLIC_API_URL=http://backend:8000 
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     networks:
       - app-network
     depends_on:
