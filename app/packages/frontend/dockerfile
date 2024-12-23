@@ -1,16 +1,18 @@
-# Stage 1: Build the Next.js application
-FROM node:18-alpine AS builder
+FROM node:18-alpine
 
 WORKDIR /frontend
 
-# Copy all workspace files
-COPY . .
+# Copy package files first to leverage Docker cache
+COPY package.json yarn.lock ./
 
-# Install dependencies for all workspaces
+# Install dependencies
 RUN yarn install
 
-# Stage 2: Serve the application
+# Copy the rest of the application
+COPY . .
 
+# Document that the container will listen on port 3000
 EXPOSE 3000
 
-CMD ["yarn", "run", "dev"]
+# Run in development mode
+CMD ["yarn", "dev"]

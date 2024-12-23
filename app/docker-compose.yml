@@ -48,13 +48,17 @@ services:
       - "3000:3000"  # Map Next.js's port
     environment:
       - API_URL=http://localhost:8000
+      - NEXT_PUBLIC_HOSTNAME=0.0.0.0
     networks:
       - app-network
     depends_on:
       - api  # Ensure the backend is ready before frontend starts
       - postgres
     volumes:
-      - .:/frontend
+      # Add this for hot reloading
+      - ./packages/frontend:/frontend
+      # Prevent node_modules from being overwritten by the volume
+      - /frontend/node_modules
 
 volumes:
   postgres-data:
