@@ -3,11 +3,20 @@ set dotenv-load
 up-api:
   docker-compose build --no-cache api && docker-compose --env-file ./.env up api -d
 
+down-api:
+  docker-compose down -v api
+
+up-postgres:
+  docker-compose build --no-cache postgres && docker-compose --env-file ./.env up postgres -d
+
+down-postgres:
+  docker-compose down postgres
+
 up:
   docker-compose build --no-cache && docker-compose --env-file ./.env up -d
 
 down:
-  docker-compose down
+  docker-compose down -v && docker volume rm $(docker volume ls -q | grep postgres)
 
 prune:
   docker system prune --all --force --volumes

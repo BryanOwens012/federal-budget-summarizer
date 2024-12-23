@@ -1,2 +1,21 @@
-# Use the official PostgreSQL image as a base
 FROM postgres:latest
+
+# Create directories
+RUN mkdir -p /docker-entrypoint-initdb.d/migrations \
+    && mkdir -p /docker-entrypoint-initdb.d/seeds \
+    && mkdir -p /var/log \
+    && chown postgres:postgres /var/log
+
+# Set environment variables
+ENV POSTGRES_DB=mydatabase
+ENV POSTGRES_USER=user
+ENV POSTGRES_PASSWORD=password
+
+# Copy migrations and seeds first
+COPY ./migrations/ /docker-entrypoint-initdb.d/migrations/
+COPY ./seeds/ /docker-entrypoint-initdb.d/seeds/
+
+# Copy and make executable the init script
+COPY ./init-db.sh /docker-entrypoint-initdb.d/000-run-all.sh
+RUN chmod +x /docker-entrypoint-initdb.d/000-run-all.sh \
+    && chown -R postgres:postgres /docker-entrypoint-initdb.d

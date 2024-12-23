@@ -5,9 +5,15 @@ from sqlalchemy import create_engine
 # Get the database URL from environment variables
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is not set")
-print(f"Connecting to database with URL: {DATABASE_URL.split('@')[1]}")  # Safely print URL without credentials
+# Parse the URL parts
+try:
+    # Split into credentials and host parts
+    auth, rest = DATABASE_URL.split('@')
+    # Split host part into host and database
+    host, db_name = rest.split('/')
+    print(f"Attempting to connect to database: {db_name.split('?')[0]}")  # Remove query params
+except Exception as e:
+    print(f"Error parsing DATABASE_URL: {e}")
 
 # Create the SQLAlchemy engine - this is our connection pool manager
 engine = create_engine(

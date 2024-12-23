@@ -10,7 +10,7 @@ services:
       - "8000:8000"  # Map FastAPI's port
     environment:
       - DATABASE_URL=${POSTGRES_DB_URL}
-      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000,example-nextjs-fastapi-production.up.railway.app
       - NEXT_PUBLIC_API_URL=http://backend:8000 
     networks:
       - app-network
