@@ -15,13 +15,14 @@ services:
     networks:
       - app-network
     depends_on:
-      - postgres  # Ensure the database is ready before backend starts
+      postgres:
+        condition: service_healthy # Ensure the database is ready before backend starts
     volumes:
       - .:/api
 
   postgres:
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "user"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 10s
       retries: 5
     build:
