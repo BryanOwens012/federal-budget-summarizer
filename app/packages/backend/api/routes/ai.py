@@ -4,16 +4,17 @@ from pdf_agent import PDFAgent
 
 router = APIRouter()
 
+# Because the GPT API lacks internet access, we can't ask GPT to retrieve the PDF from the internet.
+# Instead, we must embed it.
+print('Embedding CR PDF')
+pdf_agent = PDFAgent(
+    pdf_path=os.getenv("CR_PDF_PATH"),
+    max_tokens=30000, # This PDF has ≈24k words, which corresponds to ≈30k tokens.
+)
+
 @router.get("/cr-summary", response_model=str)
 async def get_crsummary():
     print("Getting CR summary")
-    return "test"
-    # Because the GPT API lacks internet access, we can't ask GPT to retrieve the PDF from the internet.
-    # Instead, we must embed it.
-    pdf_agent = PDFAgent(
-        pdf_path=os.getenv("CR_PDF_PATH"),
-        max_tokens=30000, # This PDF has ≈24k words, which corresponds to ≈30k tokens.
-    )
 
     prompt = """
     You are an expert on federal law, federal agencies, Congress, and the Constitution.
