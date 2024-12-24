@@ -1,6 +1,6 @@
 import uvicorn
 
-if __name__ == "__main__":
+async def run():
     uvicorn.run(
         "main:app",
         host="0.0.0.0", 
@@ -8,3 +8,6 @@ if __name__ == "__main__":
         log_level="info",
         reload=True
     )
+
+if __name__ == "__main__":
+   run()

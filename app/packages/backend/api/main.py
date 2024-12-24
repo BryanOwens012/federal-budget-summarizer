@@ -8,6 +8,8 @@ import os
 from routes import products
 from routes import ai
 
+from entrypoint import run
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     # Startup: Test database connection before the application starts accepting requests
@@ -44,3 +46,6 @@ app.add_middleware(
 # Include the routers
 app.include_router(products.router, prefix="/v1/products")
 app.include_router(ai.router, prefix="/v1/ai")
+
+if __name__ == "__main__":
+    run()
