@@ -31,7 +31,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://0.0.0.0:3000",
         "http://frontend:3000",  # Docker service name
-        os.getenv("RAILWAY_URL", "http://localhost:3000"),
+        os.getenv("NEXT_PUBLIC_RAILWAY_FE_URL", "http://localhost:3000"),
         os.getenv("RAILWAY_PUBLIC_DOMAIN", "http://localhost:3000"),
         os.getenv("RAILWAY_PRIVATE_DOMAIN", "http://localhost:3000"),
         os.getenv("RAILWAY_SERVICE_NAME", "http://localhost:3000"),

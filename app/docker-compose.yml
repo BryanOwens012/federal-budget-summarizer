@@ -14,7 +14,7 @@ services:
       - NEXT_PUBLIC_API_URL=http://backend
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - CR_PDF_PATH=${CR_PDF_PATH_IN_API_PACKAGE}
-      - RAILWAY_URL=${RAILWAY_URL}
+      - NEXT_PUBLIC_RAILWAY_FE_URL=${NEXT_PUBLIC_RAILWAY_FE_URL}
     networks:
       - app-network
     depends_on:
@@ -51,9 +51,8 @@ services:
     ports:
       - "3000:3000"  # Map Next.js's port
     environment:
-      - API_URL=http://localhost:8000
-      - NEXT_PUBLIC_HOSTNAME=0.0.0.0
-      - RAILWAY_URL=${RAILWAY_URL}
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_RAILWAY_URL=${NEXT_PUBLIC_RAILWAY_FE_URL}
     networks:
       - app-network
     depends_on:

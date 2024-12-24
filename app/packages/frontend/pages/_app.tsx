@@ -6,10 +6,7 @@ import { useState } from "react";
 const port = 8000;
 
 export const apiURL =
-  (process.env.RAILWAY_API_PRIVATE_DOMAIN ||
-    process.env.RAILWAY_API_PUBLIC_DOMAIN ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    "http://localhost") + `:${port}`;
+  (process.env.NEXT_PUBLIC_API_URL || "http://localhost") + `:${port}`;
 
 export const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
 

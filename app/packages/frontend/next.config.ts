@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true, // Enforce React strict mode
   swcMinify: true, // Enable SWC-based minification for faster builds
   env: {
-    API_URL: "http://localhost:8080", // Custom environment variable
+    API_URL: process.env.NEXT_PUBLIC_API_URL, // Custom environment variable
   },
   // Custom rewrites for mapping one route to another
   async rewrites() {
