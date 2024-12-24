@@ -3,10 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
 import { useState } from "react";
 
-const port = 8000;
-
 export const apiURL =
-  (process.env.NEXT_PUBLIC_API_URL || "http://localhost") + `:${port}`;
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
 
