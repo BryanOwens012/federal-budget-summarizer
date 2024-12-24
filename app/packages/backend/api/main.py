@@ -5,8 +5,8 @@ from querier import engine
 from sqlalchemy import text
 import os
 
-import routes.products
-import routes.ai
+from routes import products
+from routes import ai
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -42,8 +42,8 @@ app.add_middleware(
 )
 
 # Include the routers
-app.include_router(routes.products.router, prefix="/v1/products")
-app.include_router(routes.ai.router, prefix="/v1/ai")
+app.include_router(products.router, prefix="/v1/products")
+app.include_router(ai.router, prefix="/v1/ai")
 
 if __name__ == "__main__":
     import uvicorn

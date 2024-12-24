@@ -15,6 +15,8 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 8000
 
+ENV PYTHONPATH=/app
+
 # Command to run the application
 # Note: We specify the host and port to make it accessible outside container
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
