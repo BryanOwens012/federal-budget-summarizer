@@ -2,6 +2,7 @@ import { NextConfig } from "next";
 
 // Define your Next.js configuration with type safety
 const nextConfig: NextConfig = {
+  output: "standalone", // Generate a standalone app for Railway
   reactStrictMode: true, // Enforce React strict mode
   swcMinify: true, // Enable SWC-based minification for faster builds
   env: {

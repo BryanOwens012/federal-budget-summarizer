@@ -14,6 +14,7 @@ services:
       - NEXT_PUBLIC_API_URL=http://backend:8000
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - CR_PDF_PATH=${CR_PDF_PATH_IN_API_PACKAGE}
+      - RAILWAY_URL=${RAILWAY_URL}
     networks:
       - app-network
     depends_on:
@@ -52,6 +53,7 @@ services:
     environment:
       - API_URL=http://localhost:8000
       - NEXT_PUBLIC_HOSTNAME=0.0.0.0
+      - RAILWAY_URL=${RAILWAY_URL}
     networks:
       - app-network
     depends_on:

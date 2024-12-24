@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from querier import engine
 from sqlalchemy import text
+import os
 
 import routes.products
 import routes.ai
@@ -30,6 +31,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://0.0.0.0:3000",
         "http://frontend:3000",  # Docker service name
+        os.getenv("RAILWAY_URL", "http://localhost:3000"),
     ],
     allow_methods=["*"],
     allow_headers=["*"],
