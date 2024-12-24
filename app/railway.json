@@ -1,0 +1,11 @@
+{
+  "frontend": {
+    "directory": "packages/frontend"
+  },
+  "backend": {
+    "directory": "packages/backend/api"
+  },
+  "database": {
+    "directory": "packages/backend/db"
+  }
+}
