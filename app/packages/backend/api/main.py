@@ -44,7 +44,7 @@ app.add_middleware(
 )
 
 # Include the routers
-app.include_router(routes.us_states.router, prefix="/v1/us_states")
+app.include_router(routes.us_states.router, prefix="/v1/us-states")
 app.include_router(routes.ai.router, prefix="/v1/ai")
 
 print("Backend API started")
