@@ -73,7 +73,7 @@ class PDFAgent:
         
         # Add response to messages
         self.messages.append({
-            "role": "agent", 
+            "role": "user", 
             "content": agent_response
         })
         
