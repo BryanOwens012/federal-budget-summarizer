@@ -1,13 +1,8 @@
 from fastapi import APIRouter
-from openai import OpenAI
 import os
 from pdf_agent import PDFAgent
 
 router = APIRouter()
-
-client = OpenAI(
-  api_key = os.getenv("OPENAI_API_KEY")
-)
 
 @router.get("/cr-summary", response_model=str)
 async def get_crsummary():
