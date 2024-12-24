@@ -12,6 +12,7 @@ class ProductList(pydantic.BaseModel):
 
 @router.get("", response_model=ProductList)
 async def list_products():
+    print("Listing products")
     with get_conn() as conn:
         q = db.products.Querier(conn)
         return ProductList(products = q.list_products())

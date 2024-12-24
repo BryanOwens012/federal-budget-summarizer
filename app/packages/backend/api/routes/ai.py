@@ -6,6 +6,7 @@ router = APIRouter()
 
 @router.get("/cr-summary", response_model=str)
 async def get_crsummary():
+    print("Getting CR summary")
     return "test"
     # Because the GPT API lacks internet access, we can't ask GPT to retrieve the PDF from the internet.
     # Instead, we must embed it.
