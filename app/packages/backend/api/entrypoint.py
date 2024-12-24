@@ -1,6 +1,6 @@
 import uvicorn
 
-async def run():
+def run():
     uvicorn.run(
         "main:app",
         host="0.0.0.0", 
