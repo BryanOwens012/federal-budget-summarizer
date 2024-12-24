@@ -2,21 +2,20 @@
 FROM python:3.10-slim
 
 # Set the working directory to match module structure
-WORKDIR /api
+WORKDIR /app/packages/backend/api
 
 # Copy requirements file and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the backend code
-# Note: We're copying from the current context to preserve module structure
 COPY . .
 
 # Expose the port the app runs on
 EXPOSE 8000
 
-ENV PYTHONPATH=/api
+# Keep PYTHONPATH the same since all imports are relative to this directory
+ENV PYTHONPATH=/app/packages/backend/api
 
-# Command to run the application
-# Note: We specify the host and port to make it accessible outside container
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Try full path to uvicorn
+CMD ["/usr/local/bin/uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
