@@ -12,6 +12,7 @@ try:
     # Split host part into host and database
     host, db_name = rest.split("/")
     print(f"Attempting to connect to database: {db_name.split('?')[0]}")  # Remove query params
+    print(f"Attempting to connect to database: {DATABASE_URL}")  # Remove query params
 except Exception as e:
     print(f"Error parsing DATABASE_URL: {e}")
 
