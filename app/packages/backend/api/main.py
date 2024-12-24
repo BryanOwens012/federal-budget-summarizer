@@ -47,5 +47,7 @@ app.add_middleware(
 app.include_router(products.router, prefix="/v1/products")
 app.include_router(ai.router, prefix="/v1/ai")
 
+print("Backend API started")
+
 if __name__ == "__main__":
     run()
