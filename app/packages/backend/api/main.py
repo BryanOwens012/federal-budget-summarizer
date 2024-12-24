@@ -44,7 +44,3 @@ app.add_middleware(
 # Include the routers
 app.include_router(products.router, prefix="/v1/products")
 app.include_router(ai.router, prefix="/v1/ai")
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(".:app", host="0.0.0.0", port=8000, reload=True, access_log=False)
