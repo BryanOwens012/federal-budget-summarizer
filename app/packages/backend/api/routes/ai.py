@@ -13,6 +13,8 @@ async def get_crsummary():
         max_tokens=30000, # This PDF has ≈24k words, which corresponds to ≈30k tokens.
     )
 
+    return "test"
+
     prompt = """
     You are an expert on federal law, federal agencies, Congress, and the Constitution.
     Analyze the following Continuing Resolution (CR, otherwise known as the federal budget)
