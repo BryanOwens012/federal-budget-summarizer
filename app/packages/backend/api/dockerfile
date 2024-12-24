@@ -15,7 +15,7 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 8000
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/packages/backend/api
 
 # Command to run the application
 # Note: We specify the host and port to make it accessible outside container
