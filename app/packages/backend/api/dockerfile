@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # Set the working directory to match module structure
-WORKDIR /api
+WORKDIR /app/packages/backend/api
 
 # Copy requirements file and install dependencies
 COPY requirements.txt .

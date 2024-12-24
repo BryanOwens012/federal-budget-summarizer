@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from querier import engine
+from utils.querier import engine
 from sqlalchemy import text
 import os
 
-from routes import products
-from routes import ai
+import routes.products
+import routes.ai
 
 from entrypoint import run
 
@@ -44,8 +44,8 @@ app.add_middleware(
 )
 
 # Include the routers
-app.include_router(products.router, prefix="/v1/products")
-app.include_router(ai.router, prefix="/v1/ai")
+app.include_router(routes.products.router, prefix="/v1/products")
+app.include_router(routes.ai.router, prefix="/v1/ai")
 
 print("Backend API started")
 

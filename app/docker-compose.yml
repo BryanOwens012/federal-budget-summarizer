@@ -15,14 +15,15 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - CR_PDF_PATH=${CR_PDF_PATH_IN_API_PACKAGE}
       - NEXT_PUBLIC_RAILWAY_FE_URL=${NEXT_PUBLIC_RAILWAY_FE_URL}
+      - PYTHONPATH=/app/packages/backend/api
     networks:
       - app-network
     depends_on:
       postgres:
         condition: service_healthy # Ensure the database is ready before backend starts
     volumes:
-      # Mount the source code for hot reloading
-      - .:/api
+      # Mount the source code for hot reloading, but keep build files intact
+      - ./packages/backend/api:/app/packages/backend/api
 
   postgres:
     healthcheck:

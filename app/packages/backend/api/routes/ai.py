@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 import os
-from pdf_agent import PDFAgent
+from utils.pdf_agent import PDFAgent
 
 router = APIRouter()
 

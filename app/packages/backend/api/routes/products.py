@@ -3,7 +3,7 @@ from db.models import Product
 from typing import List
 import db.products
 import pydantic
-from querier import get_conn
+from utils.querier import get_conn
 
 router = APIRouter()
 
