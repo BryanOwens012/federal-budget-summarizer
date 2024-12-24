@@ -12,11 +12,11 @@ up-fe:
 down-fe:
   docker-compose down -v frontend
 
-up-postgres:
+up-db:
   docker-compose build --no-cache postgres && docker-compose --env-file ./.env up postgres -d
 
-down-postgres:
-  docker-compose down postgres
+down-db:
+  docker-compose down -v postgres
 
 up:
   docker-compose build --no-cache && docker-compose --env-file ./.env up -d

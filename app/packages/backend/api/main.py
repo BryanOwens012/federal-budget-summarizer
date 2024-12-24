@@ -5,7 +5,7 @@ from utils.querier import engine
 from sqlalchemy import text
 import os
 
-import routes.products
+import routes.us_states
 import routes.ai
 
 from entrypoint import run
@@ -44,7 +44,7 @@ app.add_middleware(
 )
 
 # Include the routers
-app.include_router(routes.products.router, prefix="/v1/products")
+app.include_router(routes.us_states.router, prefix="/v1/us_states")
 app.include_router(routes.ai.router, prefix="/v1/ai")
 
 print("Backend API started")

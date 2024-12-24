@@ -1,7 +1,6 @@
-CREATE TABLE products (
+CREATE TABLE us_states (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name TEXT NOT NULL,
-    pricecents INT,
+    name TEXT,
     createdat TIMESTAMPTZ DEFAULT now(),
     updatedat TIMESTAMPTZ DEFAULT now()
 );
@@ -11,4 +10,4 @@ RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 CREATE TRIGGER on_update BEFORE
-UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+UPDATE ON us_states FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

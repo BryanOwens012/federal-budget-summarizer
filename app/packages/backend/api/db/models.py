@@ -6,9 +6,8 @@ import pydantic
 from typing import Optional
 
 
-class Product(pydantic.BaseModel):
+class UsState(pydantic.BaseModel):
     id: int
-    name: str
-    pricecents: Optional[int]
+    name: Optional[str]
     createdat: Optional[datetime.datetime]
     updatedat: Optional[datetime.datetime]

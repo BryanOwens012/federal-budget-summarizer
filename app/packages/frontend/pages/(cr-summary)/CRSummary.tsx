@@ -1,9 +1,11 @@
+import { ListUSStatesRow } from "@/db/us_states_sql";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import React from "react";
 import { apiURL, apiVersion } from "../_app";
 
 type CESummaryResponse = string;
+type USStatesResponse = { us_states: ListUSStatesRow[] };
 
 const crOriginalDocURL =
   "https://www.congress.gov/bill/118th-congress/house-bill/10545/text";
@@ -28,10 +30,34 @@ const fetchCRSummary = async (): Promise<CESummaryResponse> => {
   }
 };
 
+const fetchUSStates = async (): Promise<USStatesResponse> => {
+  try {
+    const response = await fetch(`${apiURL}/${apiVersion}/us-states`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching US states:", error);
+    throw error;
+  }
+};
+
 const CRSummary: React.FC = () => {
   const { data, isLoading, error } = useQuery<CESummaryResponse>({
     queryKey: ["ce-summary"],
     queryFn: fetchCRSummary,
+  });
+  const { data: usStatesData } = useQuery<USStatesResponse>({
+    queryKey: ["us-states"],
+    queryFn: fetchUSStates,
   });
 
   if (isLoading) {
@@ -80,6 +106,21 @@ const CRSummary: React.FC = () => {
                   <p>{bulletPoint}</p>
                 </div>
               ))}
+            </div>
+          </div>
+          <p>US States:</p>
+          <div className="flex items-center">
+            <div className="flex flex-col gap-y-4 text-base max-w-fit">
+              {usStatesData?.us_states
+                .filter((usState) => usState.name)
+                .map((usState) => (
+                  <div
+                    key={usState.id}
+                    className="text-left p-4 border-black border-2"
+                  >
+                    <p>{usState.name}</p>
+                  </div>
+                ))}
             </div>
           </div>
         </div>

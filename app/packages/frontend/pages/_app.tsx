@@ -8,9 +8,6 @@ export const apiURL =
 
 export const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
 
-console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
-console.log("Final apiURL:", apiURL);
-
 const App = ({ Component, pageProps }: AppProps) => {
   const [queryClient] = useState(() => new QueryClient());
   return (

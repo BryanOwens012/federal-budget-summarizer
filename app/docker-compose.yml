@@ -61,11 +61,11 @@ services:
       - postgres
     volumes:
       # Mount source code for hot reloading, but keep build files intact
-      - ./.next:/src/.next
-      - ./db:/src/db
-      - ./pages:/src/pages
-      - ./public:/src/public
-      - ./styles:/src/styles
+      - ./packages/frontend/.next:/src/.next
+      - ./packages/frontend/db:/src/db
+      - ./packages/frontend/pages:/src/pages
+      - ./packages/frontend/public:/src/public
+      - ./packages/frontend/styles:/src/styles
 
 volumes:
   postgres-data:
