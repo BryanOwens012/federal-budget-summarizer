@@ -1,10 +1,15 @@
 import "@/styles/global.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { AppProps } from "next/app";
-import React, { useState } from "react";
+import { useState } from "react";
+
+const port = 8000;
 
 export const apiURL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  (process.env.RAILWAY_PUBLIC_DOMAIN ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost") + `:${port}`;
+
 export const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || "v1";
 
 const App = ({ Component, pageProps }: AppProps) => {
