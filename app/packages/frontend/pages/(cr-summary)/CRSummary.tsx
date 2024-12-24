@@ -54,10 +54,20 @@ const CRSummary: React.FC = () => {
   const { data, isLoading, error } = useQuery<CESummaryResponse>({
     queryKey: ["ce-summary"],
     queryFn: fetchCRSummary,
+
+    // refetches are unnecessary, as the data is static
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
   const { data: usStatesData } = useQuery<USStatesResponse>({
     queryKey: ["us-states"],
     queryFn: fetchUSStates,
+
+    // refetches are unnecessary, as the data is static
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {
