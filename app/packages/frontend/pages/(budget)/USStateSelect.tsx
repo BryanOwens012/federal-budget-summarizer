@@ -3,7 +3,6 @@
 import {
   SelectContent,
   SelectItem,
-  SelectLabel,
   SelectRoot,
   SelectTrigger,
   SelectValueText,
@@ -11,10 +10,12 @@ import {
 import { ListUSStatesRow } from "@/db/us_states_sql";
 import { createListCollection } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { apiURL, apiVersion } from "../_app";
 
 type ListUSStatesResponse = { us_states: ListUSStatesRow[] };
+
+export const emptyUSState = "-";
 
 const listUSStates = async (): Promise<ListUSStatesResponse> => {
   try {
@@ -36,8 +37,12 @@ const listUSStates = async (): Promise<ListUSStatesResponse> => {
   }
 };
 
-export const USStateSelect = () => {
-  const { data: usStatesData } = useQuery<ListUSStatesResponse>({
+export const USStateSelect = ({
+  setSelected,
+}: {
+  setSelected: Dispatch<SetStateAction<string>>;
+}) => {
+  const { data } = useQuery<ListUSStatesResponse>({
     queryKey: ["list-us-states"],
     queryFn: listUSStates,
 
@@ -47,28 +52,39 @@ export const USStateSelect = () => {
     refetchOnWindowFocus: false,
   });
 
-  const usStates = useMemo(
-    () =>
-      createListCollection({
-        items:
-          usStatesData?.us_states.map((usState) => ({
-            label: usState.name,
-            value: usState.name,
-          })) || [],
-      }),
-    [usStatesData]
-  );
+  const items = useMemo(() => {
+    const stateNames = (data?.us_states ?? [])
+      .filter((state) => state.name)
+      .map((state) => state.name!);
+
+    return createListCollection({
+      items: [emptyUSState, ...stateNames].map((stateName) => ({
+        label: stateName,
+        value: stateName,
+      })),
+    });
+  }, [data]);
 
   return (
-    <SelectRoot collection={usStates} size="sm" width="320px">
-      <SelectLabel>Select U.S. state</SelectLabel>
+    <SelectRoot
+      collection={items}
+      size="sm"
+      width="320px"
+      variant="outline"
+      defaultValue={[emptyUSState]}
+      onValueChange={(item) => setSelected(item.value[0])}
+    >
       <SelectTrigger>
         <SelectValueText placeholder="Select state" />
       </SelectTrigger>
       <SelectContent>
-        {usStates.items.map((usState) => (
-          <SelectItem item={usState} key={usState.value}>
-            {usState.label}
+        {items.items.map((item) => (
+          <SelectItem
+            item={item}
+            key={item.value}
+            className="hover:cursor-pointer hover:bg-gray-500"
+          >
+            {item.label}
           </SelectItem>
         ))}
       </SelectContent>
