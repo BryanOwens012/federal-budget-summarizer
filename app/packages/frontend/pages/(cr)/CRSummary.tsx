@@ -89,49 +89,44 @@ const CRSummary: React.FC = () => {
   const [introParagraph, ...bulletPoints] = (data ?? "").split(">>");
 
   return (
-    <div className="m-10 overflow-auto max-w-full md:max-w-4/5 lg:max-w-3/4 xl:max-w-2/3">
-      <div className="flex items-center justify-center">
-        <div className="flex flex-col gap-y-10">
-          <h1 className="text-center text-4xl font-bold text-green-600">
-            Summary of the Continuing Resolution (federal budget) signed into
-            law on 12/21/2024
-          </h1>
-          <div className="flex flex-col gap-y-2">
-            <h3 className="text-center text-base">As summarized by ChatGPT</h3>
-            <Link href={crOriginalDocURL} target="_blank">
-              <h3 className="text-center text-base text-blue-500 underline">
-                View the CR
-              </h3>
-            </Link>
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
+      <div className="flex flex-col gap-y-10">
+        <h1 className="text-center text-4xl font-bold text-green-600">
+          What's in the new federal budget?
+        </h1>
+        <div className="flex flex-col gap-y-2">
+          <h3 className="text-center text-base">As summarized by ChatGPT</h3>
+          <Link href={crOriginalDocURL} target="_blank">
+            <h3 className="text-center text-base text-blue-500 underline">
+              View the federal budget ("continuing resolution") passed on
+              12/21/24
+            </h3>
+          </Link>
+        </div>
+        <p className="text-base">{introParagraph}</p>
+        <p>Major provisions:</p>
+        <div className="flex items-center">
+          <div className="flex flex-col gap-y-4 text-base max-w-fit">
+            {bulletPoints.map((bulletPoint, index) => (
+              <div key={index} className="text-left p-4 border-black border-2">
+                <p>{bulletPoint}</p>
+              </div>
+            ))}
           </div>
-          <p className="text-base">{introParagraph}</p>
-          <p>Major provisions:</p>
-          <div className="flex items-center">
-            <div className="flex flex-col gap-y-4 text-base max-w-fit">
-              {bulletPoints.map((bulletPoint, index) => (
+        </div>
+        <p>US States:</p>
+        <div className="flex items-center">
+          <div className="flex flex-col gap-y-4 text-base max-w-fit">
+            {usStatesData?.us_states
+              .filter((usState) => usState.name)
+              .map((usState) => (
                 <div
-                  key={index}
+                  key={usState.id}
                   className="text-left p-4 border-black border-2"
                 >
-                  <p>{bulletPoint}</p>
+                  <p>{usState.name}</p>
                 </div>
               ))}
-            </div>
-          </div>
-          <p>US States:</p>
-          <div className="flex items-center">
-            <div className="flex flex-col gap-y-4 text-base max-w-fit">
-              {usStatesData?.us_states
-                .filter((usState) => usState.name)
-                .map((usState) => (
-                  <div
-                    key={usState.id}
-                    className="text-left p-4 border-black border-2"
-                  >
-                    <p>{usState.name}</p>
-                  </div>
-                ))}
-            </div>
           </div>
         </div>
       </div>
