@@ -15,7 +15,7 @@ export const Page = () => {
   const [usState, setUSState] = useState(emptyUSState);
 
   return (
-    <div className="m-10 overflow-auto max-w-full md:max-w-4/5 lg:max-w-3/4 xl:max-w-2/3">
+    <div className="m-10 max-w-full md:max-w-4/5 lg:max-w-3/4 xl:max-w-2/3">
       <div className="flex flex-col items-center justify-center">
         <div className="flex flex-col gap-y-10">
           <h1 className="text-center text-4xl font-bold text-green-600">

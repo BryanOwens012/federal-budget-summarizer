@@ -42,7 +42,7 @@ export const USStateSelect = ({
 }: {
   setSelected: Dispatch<SetStateAction<string>>;
 }) => {
-  const { data } = useQuery<ListUSStatesResponse>({
+  const { data, isLoading, error } = useQuery<ListUSStatesResponse>({
     queryKey: ["list-us-states"],
     queryFn: listUSStates,
 
@@ -53,22 +53,30 @@ export const USStateSelect = ({
   });
 
   const items = useMemo(() => {
+    const emptyUSStateItem = {
+      label: error ? "Error" : isLoading ? "Loading..." : emptyUSState,
+      value: emptyUSState,
+    };
+
     const stateNames = (data?.us_states ?? [])
       .filter((state) => state.name)
       .map((state) => state.name!);
 
     return createListCollection({
-      items: [emptyUSState, ...stateNames].map((stateName) => ({
-        label: stateName,
-        value: stateName,
-      })),
+      items: [
+        emptyUSStateItem,
+        ...stateNames.map((stateName) => ({
+          label: stateName,
+          value: stateName,
+        })),
+      ],
     });
   }, [data]);
 
   return (
     <SelectRoot
       collection={items}
-      size="sm"
+      size="md"
       width="320px"
       variant="outline"
       defaultValue={[emptyUSState]}

@@ -49,7 +49,7 @@ export const Summaries = ({ usState }: { usState: string }) => {
   if (isLoading) {
     return (
       <div className="flex items-center">
-        <Spinner />
+        <Spinner size="lg" color="teal.500" />
       </div>
     );
   }
@@ -65,7 +65,7 @@ export const Summaries = ({ usState }: { usState: string }) => {
   const [_, ...summaries] = (data ?? "").split(">>");
 
   return (
-    <div className="flex items-center overflow-y-hidden">
+    <div className="flex items-center">
       <div className="flex flex-col gap-y-4 text-base max-w-fit">
         {summaries.map((summary, index) => (
           <Summary key={index} text={summary} />
