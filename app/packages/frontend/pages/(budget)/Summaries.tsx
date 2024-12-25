@@ -1,6 +1,5 @@
 "use client";
 
-import { Spinner } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { apiURL, apiVersion } from "../_app";
 import { Summary } from "./Summary";
@@ -47,11 +46,7 @@ export const Summaries = ({ usState }: { usState: string }) => {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex items-center">
-        <Spinner size="lg" color="teal.500" />
-      </div>
-    );
+    return <div className="flex items-center justify-center">Loading...</div>;
   }
 
   if (error) {
