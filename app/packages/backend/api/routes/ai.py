@@ -6,7 +6,7 @@ router = APIRouter()
 
 # Because the GPT API lacks internet access, we can't ask GPT to retrieve the PDF from the internet.
 # Instead, we must embed it.
-print('Embedding budget PDF')
+print('Embedding budget PDF: ', os.getenv("BUDGET_PDF_PATH"))
 pdf_agent = PDFAgent(
     pdf_path=os.getenv("BUDGET_PDF_PATH"),
     max_tokens=30000, # This PDF has ≈24k words, which corresponds to ≈30k tokens.
