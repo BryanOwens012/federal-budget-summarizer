@@ -1,5 +1,5 @@
 import React from "react";
-import CRSummary from "./(cr)/CRSummary";
+import CRSummary from "./(budget)/CRSummary";
 
 const Home: React.FC = () => {
   return <CRSummary />;

@@ -92,7 +92,7 @@ class PDFAgent:
 
 if __name__ == "__main__":
     pdf_agent = PDFAgent(
-        pdf_path=os.getenv("CR_PDF_PATH"),
+        pdf_path=os.getenv("BUDGET_PDF_PATH"),
     )
     
     # First query about the PDF

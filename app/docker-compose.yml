@@ -13,7 +13,7 @@ services:
       - CORS_ORIGINS=http://localhost:3000,http://frontend:3000,example-nextjs-fastapi-production.up.railway.app
       - NEXT_PUBLIC_API_URL=http://backend
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - CR_PDF_PATH=${CR_PDF_PATH_IN_API_PACKAGE}
+      - BUDGET_PDF_PATH=${BUDGET_PDF_PATH_IN_API_PACKAGE}
       - NEXT_PUBLIC_RAILWAY_FE_URL=${NEXT_PUBLIC_RAILWAY_FE_URL}
       - PYTHONPATH=/app/packages/backend/api
     networks:
