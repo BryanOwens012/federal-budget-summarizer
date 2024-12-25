@@ -26,7 +26,7 @@ async def get_crsummary():
     Instead, dive right into the content.
 
     Structure your answer in the following way:
-    A bullet-pointed list of the key provisions of the budget.
+    A bullet-pointed list of the 5 most salient provisions of the budget.
     To delimit each bullet point, its text should begin with the string ">>"
     (don't include a hyphen or other different delimiter).
     Don't begin the sentence with "The budget..." or "The bill" or something similar.

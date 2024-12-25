@@ -1,8 +1,7 @@
-import React from "react";
-import CRSummary from "./(budget)/CRSummary";
+import { Page as BudgetPage } from "./(budget)/Page";
 
-const Home: React.FC = () => {
-  return <CRSummary />;
+const Home = () => {
+  return <BudgetPage />;
 };
 
 export default Home;

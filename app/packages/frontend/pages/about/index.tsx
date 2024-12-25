@@ -1,10 +1,9 @@
 import Link from "next/link";
-import React from "react";
 
 const resumeLink =
   "https://drive.google.com/file/d/1FU8IAKn2pmwVPjDIe6C4B-aPEHB7_T4M/view?usp=drive_link";
 
-const About: React.FC = () => {
+const About = () => {
   return (
     <div className="flex flex-col items-center justify-center">
       <h1 className="text-4xl font-bold text-red-500">About Bryan Owens</h1>
