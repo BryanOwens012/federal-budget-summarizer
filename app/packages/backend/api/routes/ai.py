@@ -12,6 +12,13 @@ class GetBudgetSummariesRequest(BaseModel):
 class GetBudgetElaborationRequest(BaseModel):
     summary: str
 
+emptyUSState = "-"
+mostLikelyUSStates = ["California", "Washington", "New York", "New Jersey", "Texas", "Florida", "Illinois"]
+
+# TODO: Replace with Redis cache
+summaries_by_us_state_cache = dict[str, str]()
+elaboration_by_summary_cache = dict[str, str]()
+
 # Because the GPT API lacks internet access, we can't ask GPT to retrieve the PDF from the internet.
 # Instead, we must parse and embed it.
 print(f"{datetime.now()} Embedding budget PDF: ", os.getenv("BUDGET_PDF_PATH"))
@@ -20,9 +27,29 @@ pdf_agent = PDFAgent(
     max_tokens=30000, # This PDF has ≈24k words, which corresponds to ≈30k tokens.
 )
 
+async def init_summaries_by_state_cache():
+    for us_state in mostLikelyUSStates:
+        print(f"{datetime.now()} Pre-caching budget summaries for {us_state}")
+        summaries_by_us_state_cache[us_state] = await get_budget_summaries(GetBudgetSummariesRequest(us_state=us_state))
+
+async def init_elaboration_by_summary_cache():
+    for us_state, summary in summaries_by_us_state_cache.items():
+        print(f"{datetime.now()} Pre-caching budget elaboration for {us_state}")
+        elaboration_by_summary_cache[summary] = await get_budget_elaboration(GetBudgetElaborationRequest(summary=summary))
+
+async def init_caches():
+    await init_summaries_by_state_cache()
+    await init_elaboration_by_summary_cache()
+
+init_caches()
+
 @router.post("/budget-summaries", response_model=str)
 async def get_budget_summaries(request: GetBudgetSummariesRequest):
-    print(f"{datetime.now()} Getting budget summaries" + ('' if request.us_state == "-" else f" for {request.us_state}"))
+    print(f"{datetime.now()} Getting budget summaries" + ('' if request.us_state == emptyUSState else f" for {request.us_state}"))
+
+    if request.us_state in summaries_by_us_state_cache:
+        print(f"{datetime.now()} Found budget summaries for {request.us_state} in cache")
+        return summaries_by_us_state_cache[request.us_state]
 
     prompt_header = """
         You are an expert on federal law, federal agencies, Congress, and the Constitution.
@@ -35,7 +62,7 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
         Instead, please jump right into the content.
     """
 
-    prompt_state = "" if request.us_state == "-" else f"""
+    prompt_state = "" if request.us_state == emptyUSState else f"""
         Focus as much as possible on the items and impacts specific to
         the state of {request.us_state} and its residents. Be as concrete as possible.
         For example, try to use numbers, percentages, dollars, and the names of cities,
@@ -61,8 +88,9 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
     """
 
     result = pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}")
+    summaries_by_us_state_cache[request.us_state] = result
 
-    print(f"{datetime.now()} Got budget summaries" + ('' if request.us_state == "-" else f" for {request.us_state}"))
+    print(f"{datetime.now()} Got budget summaries" + ('' if request.us_state == emptyUSState else f" for {request.us_state}"))
 
     return result
 
@@ -70,6 +98,10 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
 async def get_budget_elaboration(request: GetBudgetElaborationRequest):
     summary_preview = request.summary[:20]
     print(f"{datetime.now()} Getting budget elaboration for \"{summary_preview}...\"")
+
+    if request.summary in elaboration_by_summary_cache:
+        print(f"{datetime.now()} Found budget elaboration for \"{summary_preview}\" in cache")
+        return elaboration_by_summary_cache[request.summary]
 
     prompt_header = """
         You are an expert on federal law, federal agencies, Congress, and the Constitution.
@@ -99,6 +131,7 @@ async def get_budget_elaboration(request: GetBudgetElaborationRequest):
     """
 
     result = pdf_agent.query(f"{prompt_header}{prompt_summary}{prompt_footer}")
+    elaboration_by_summary_cache[request.summary] = result
 
     print(f"{datetime.now()} Got budget elaboration for \"{summary_preview}...\"")
 

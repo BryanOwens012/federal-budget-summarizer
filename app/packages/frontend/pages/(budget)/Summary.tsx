@@ -16,7 +16,11 @@ export const Summary = ({
       })}
     >
       <p className="whitespace-pre-line">{text}</p>
-      <Elaboration summary={text} shouldShow={!!text} />
+      <Elaboration
+        summary={text}
+        shouldShow={!!text}
+        isSummaryFetching={isFetching}
+      />
     </div>
   );
 };

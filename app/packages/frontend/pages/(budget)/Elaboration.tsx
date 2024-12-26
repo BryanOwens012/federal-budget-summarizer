@@ -35,9 +35,11 @@ const getBudgetElaboration = async (
 export const Elaboration = ({
   summary,
   shouldShow,
+  isSummaryFetching,
 }: {
   summary: string;
   shouldShow: boolean;
+  isSummaryFetching: boolean;
 }) => {
   // Use `isFetching` instead of `isLoading`, because `isLoading` is always false if the placeholder data has been cached
   const { data, error, isFetching } = useQuery<GetBudgetElaborationResponse>({
@@ -56,11 +58,13 @@ export const Elaboration = ({
     return <></>;
   }
 
+  const shouldGrayOut = isSummaryFetching || isFetching;
+
   return (
     <div
       className={classNames("flex flex-col gap-y-8 text-left", {
-        "text-gray-300": isFetching,
-        "text-black": !isFetching,
+        "text-gray-300": shouldGrayOut,
+        "text-black": !shouldGrayOut,
       })}
     >
       {error ? (
