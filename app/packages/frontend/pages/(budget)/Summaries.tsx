@@ -5,6 +5,7 @@ import { apiURL, apiVersion } from "../_app";
 import { Summary } from "./Summary";
 
 type ListBudgetSummariesResponse = string;
+const summaryDelimiter = ">>";
 
 const listBudgetSummaries = async (
   usState: string
@@ -48,17 +49,17 @@ export const Summaries = ({ usState }: { usState: string }) => {
     placeholderData: (previousData) => previousData,
   });
 
-  const [_, ...summaries] = (data ?? "").split(">>");
+  const [_, ...summaries] = (data ?? "").split(summaryDelimiter);
 
   return (
     <div className="flex items-center">
       <div className="flex flex-col gap-y-4 text-base max-w-fit">
         {error ? (
-          <div>Error: {error.message}</div>
+          <p>Error getting response from ChatGPT: {error.message}</p>
         ) : isFetching ? (
-          <div>Getting response from ChatGPT...</div>
+          <p>Getting response from ChatGPT...</p>
         ) : data ? (
-          <div>Here's how the budget affects you:</div>
+          <p>Here's how the budget affects you:</p>
         ) : (
           <></>
         )}

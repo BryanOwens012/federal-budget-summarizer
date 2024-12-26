@@ -47,8 +47,6 @@ class PDFAgent:
             self.embeddings.append(response.data[0].embedding)
         except Exception as e:
             print(f"{datetime.now()} Error creating embedding: {e}")
-            # Add a placeholder embedding if creation fails
-            self.embeddings.append(np.zeros(3072))  # text-embedding-3-large dimensionality
 
     def _manage_context(self):
         """Manage conversation context to stay within token limits"""
@@ -89,13 +87,10 @@ class PDFAgent:
             # Extract agent's response
             agent_response = response.choices[0].message.content
             
-            # Add response to messages and create its embedding
-            assistant_message = {
-                "role": "assistant",
-                "content": agent_response
-            }
-            self.messages.append(assistant_message)
-            self._add_embedding(assistant_message)
+            # Now that we've extracted the response, remove the user message and its embedding,
+            # so that future queries don't get confused by it.
+            self.messages.pop(-1)
+            self.embeddings.pop(-1)
             
             return agent_response
             

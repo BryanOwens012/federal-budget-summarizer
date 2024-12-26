@@ -9,8 +9,11 @@ router = APIRouter()
 class GetBudgetSummariesRequest(BaseModel):
     us_state: str
 
+class GetBudgetElaborationRequest(BaseModel):
+    summary: str
+
 # Because the GPT API lacks internet access, we can't ask GPT to retrieve the PDF from the internet.
-# Instead, we must embed it.
+# Instead, we must parse and embed it.
 print(f"{datetime.now()} Embedding budget PDF: ", os.getenv("BUDGET_PDF_PATH"))
 pdf_agent = PDFAgent(
     pdf_path=os.getenv("BUDGET_PDF_PATH"),
@@ -23,12 +26,13 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
 
     prompt_header = """
         You are an expert on federal law, federal agencies, Congress, and the Constitution.
+        You are also highly skilled in writing, particularly in writing concise, informative summaries for the public.
         Analyze the following federal budget
         that was signed into law on 12/21/2024 by President Joe Biden.
         Summarize the budget in layman's terms. Minimize jargon, and use simple language.
         If you really have to use jargon to get a point across, include a parenthetical explanation or definition.
         Do not include an introduction that reads along the lines of "This document...".
-        Instead, dive right into the content.
+        Instead, please jump right into the content.
     """
 
     prompt_state = "" if request.us_state == "-" else f"""
@@ -44,12 +48,16 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
 
     prompt_footer = """
         Structure your answer in the following way:
-        A bullet-pointed list of the 5 most salient provisions of the budget.
+        A bullet-pointed list of the 5 most salient provisions of the budget, in order of importance.
+
         To delimit each bullet point, its text should begin with the string ">>"
-        (don't include a hyphen or other different delimiter).
+        (but without the quotation marks that I added there; don't include a hyphen or other different delimiter).
         Don't begin the sentence with "The budget..." or "The bill" or something similar.
         Instead, please jump right into the content.
         E.g., "Allocates..." or "Provides..." or something similar.
+
+        Split into paragraphs if necessary. Make a line break between each paragraph using exactly one occurence of the usual backslash-n string.
+        Don't add too much space or newlines between paragraphs.
     """
 
     result = pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}")
@@ -57,3 +65,41 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
     print(f"{datetime.now()} Got budget summaries" + ('' if request.us_state == "-" else f" for {request.us_state}"))
 
     return result
+
+@router.post("/budget-elaboration", response_model=str)
+async def get_budget_elaboration(request: GetBudgetElaborationRequest):
+    summary_preview = request.summary[:20]
+    print(f"{datetime.now()} Getting budget elaboration for \"{summary_preview}...\"")
+
+    prompt_header = """
+        You are an expert on federal law, federal agencies, Congress, and the Constitution.
+        You are also highly skilled in writing, particularly in writing concise, informative summaries for the public.
+        I previously asked you to summarize the following federal budget
+        that was signed into law on 12/21/2024 by President Joe Biden.
+    """
+
+    prompt_summary = f"""
+        You gave me with the following summary of the budget:
+        Begin-summary>>{request.summary}<<End-summary
+        """
+
+    prompt_footer = f"""
+        Now, please give me a long-form (7-10 sentences) elaboration of that summary.
+        Including its motivations, causes, implications, supporters (names of organizations and people), and future projected changes.
+        Be as specific as possible, based on your knowledge of this budget and what you can find in your knowledge base and training data.
+
+        Use layman's terms. Minimize jargon, and use simple language.
+        If you really have to use jargon to get a point across, include a parenthetical explanation or definition.
+    
+        Do not include an introduction that reads along the lines of "This document...", "This summary...", "This budget...", etc.
+        Instead, please jump right into the content.
+
+        Split into paragraphs if necessary. Make a line break between each paragraph using exactly one occurence of the usual backslash-n string.
+        Don't add too much space or newlines between paragraphs.
+    """
+
+    result = pdf_agent.query(f"{prompt_header}{prompt_summary}{prompt_footer}")
+
+    print(f"{datetime.now()} Got budget elaboration for \"{summary_preview}...\"")
+
+    return result   

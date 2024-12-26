@@ -62,6 +62,7 @@ services:
     volumes:
       # Mount source code for hot reloading, but keep build files intact
       - ./packages/frontend/.next:/src/.next
+      - ./packages/frontend/components:/src/components
       - ./packages/frontend/db:/src/db
       - ./packages/frontend/pages:/src/pages
       - ./packages/frontend/public:/src/public

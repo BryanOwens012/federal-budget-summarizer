@@ -25,7 +25,7 @@ export const Page = () => {
             </Link>
             {" mean for you?"}
           </h1>
-          <p className="text-base whitespace-pre-wrap">{introParagraph}</p>
+          <p className="text-base whitespace-pre-line">{introParagraph}</p>
           <div>
             Select your state:
             <USStateSelect setSelected={setUSState} />
