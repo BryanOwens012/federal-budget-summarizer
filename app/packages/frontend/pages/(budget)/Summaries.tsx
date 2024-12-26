@@ -53,7 +53,7 @@ export const Summaries = ({ usState }: { usState: string }) => {
 
   return (
     <div className="flex items-center">
-      <div className="flex flex-col gap-y-4 text-base max-w-fit">
+      <div className="flex flex-col gap-y-4 text-base max-w-fit items-center">
         {error ? (
           <p>Error getting response from ChatGPT: {error.message}</p>
         ) : isFetching ? (

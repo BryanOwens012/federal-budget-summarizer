@@ -43,8 +43,8 @@ export const Page = () => {
       </div>
       <div className="m-10 max-w-full md:max-w-4/5 lg:max-w-3/4 xl:max-w-2/3 z-10 relative">
         <div className="flex flex-col items-center justify-center">
-          <div className="flex flex-col gap-y-10">
-            <h1 className="text-center text-4xl font-bold text-green-600">
+          <div className="flex flex-col gap-y-10 items-center">
+            <h1 className="text-center text-4xl font-bold text-blue-500">
               {"What does the "}
               <Link href={budgetURL} target="_blank" className="underline">
                 new federal budget

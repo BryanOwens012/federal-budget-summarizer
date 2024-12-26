@@ -1,9 +1,10 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card } from "@chakra-ui/react";
 import classNames from "classnames";
-import { useMemo } from "react";
-import Elaboration from "./Elaboration";
+import { useMemo, useState } from "react";
+import { Elaboration } from "./Elaboration";
 
 const titleDelimiter = "title>>";
 
@@ -21,24 +22,42 @@ export const Summary = ({
     "text-black": !isFetching,
   });
 
+  const [shouldShowElaboration, setShouldShowElaboration] =
+    useState<boolean>(false);
+
   return (
-    <Card.Root>
+    <Card.Root className="border-2">
       <Card.Body gap="2">
-        <Card.Title mt="2" className={textClassName}>
+        <Card.Title
+          mt="2"
+          className={classNames(textClassName, "pl-4 font-semibold")}
+        >
           {title}
         </Card.Title>
         <Card.Description>
           <div
-            className={classNames("p-4 flex flex-col gap-y-2", textClassName)}
+            className={classNames(textClassName, "p-4 flex flex-col gap-y-2")}
           >
-            <p>{summary}</p>
+            {summary}
+          </div>
+        </Card.Description>
+        <Card.Footer justifyContent="flex-end">
+          <div className="flex flex-col gap-y-12">
+            <Button
+              onClick={() =>
+                setShouldShowElaboration((shouldShow) => !shouldShow)
+              }
+            >
+              Learn more
+            </Button>
+
             <Elaboration
               summary={summary}
-              shouldShow={!!text}
+              shouldShow={shouldShowElaboration}
               isSummaryFetching={isFetching}
             />
           </div>
-        </Card.Description>
+        </Card.Footer>
       </Card.Body>
     </Card.Root>
   );
