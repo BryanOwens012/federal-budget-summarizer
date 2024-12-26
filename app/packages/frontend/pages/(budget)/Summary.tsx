@@ -16,9 +16,11 @@ const titleDelimiter = "title>>";
 const elaborationAccordionValue = "elaboration";
 
 export const Summary = ({
+  usState,
   text,
   isFetching,
 }: {
+  usState: string;
   text: string;
   isFetching: boolean;
 }) => {
@@ -73,6 +75,7 @@ export const Summary = ({
               <AccordionItemContent>
                 <div className="my-4">
                   <Elaboration
+                    usState={usState}
                     summary={summary}
                     shouldShow={true}
                     isSummaryFetching={isFetching}

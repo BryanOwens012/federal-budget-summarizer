@@ -70,7 +70,12 @@ export const Summaries = ({ usState }: { usState: string }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
           {summaries.map((summary, index) => (
-            <Summary key={index} text={summary} isFetching={isFetching} />
+            <Summary
+              key={index}
+              usState={usState}
+              text={summary}
+              isFetching={isFetching}
+            />
           ))}
         </div>
       </div>

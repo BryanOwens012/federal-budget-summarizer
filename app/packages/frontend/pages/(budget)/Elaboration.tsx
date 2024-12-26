@@ -3,12 +3,14 @@
 import { Alert } from "@/components/ui/alert";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
+import { useEffect, useRef } from "react";
 import { apiURL, apiVersion } from "../_app";
 
 type GetBudgetElaborationResponse = string;
 
 const getBudgetElaboration = async (
-  summary: string
+  summary: string,
+  { signal }: { signal?: AbortSignal }
 ): Promise<GetBudgetElaborationResponse> => {
   try {
     const response = await fetch(
@@ -21,6 +23,7 @@ const getBudgetElaboration = async (
         body: JSON.stringify({
           summary,
         }),
+        signal,
       }
     );
 
@@ -36,18 +39,39 @@ const getBudgetElaboration = async (
 };
 
 export const Elaboration = ({
+  usState,
   summary,
   shouldShow,
   isSummaryFetching,
 }: {
+  usState: string;
   summary: string;
   shouldShow: boolean;
   isSummaryFetching: boolean;
 }) => {
+  const abortController = useRef(new AbortController());
+  const previousUsState = useRef(usState);
+
+  // Abort ongoing queries when usState changes
+  useEffect(() => {
+    if (usState !== previousUsState.current) {
+      abortController.current.abort("Aborted query because US state changed");
+      previousUsState.current = usState;
+    }
+  }, [usState]);
+
+  // Create new controller when summary changes
+  useEffect(() => {
+    if (summary) {
+      abortController.current = new AbortController();
+    }
+  }, [summary]);
+
   // Use `isFetching` instead of `isLoading`, because `isLoading` is always false if the placeholder data has been cached
   const { data, error, isFetching } = useQuery<GetBudgetElaborationResponse>({
     queryKey: ["get-budget-elaboration", summary],
-    queryFn: () => getBudgetElaboration(summary),
+    queryFn: () =>
+      getBudgetElaboration(summary, { signal: abortController.current.signal }),
 
     // refetches are unnecessary, because the data is static
     refetchOnMount: false,
