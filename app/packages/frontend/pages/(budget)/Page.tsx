@@ -34,6 +34,26 @@ const CapitolImage = () => {
   );
 };
 
+const GitHubImage = () => {
+  return (
+    <Link
+      href="https://github.com/BryanOwens012/federal-budget-summarizer"
+      target="_blank"
+    >
+      <Box position="relative" width="5" height="100%" overflow="visible">
+        <Image
+          src="github_logo.png"
+          alt="GitHub logo. Source: https://www.flaticon.com/free-icon/github_2111432"
+          width="100%"
+          height="100%"
+          objectFit="cover"
+          objectPosition="center"
+        />
+      </Box>
+    </Link>
+  );
+};
+
 export const Page = () => {
   const [usState, setUSState] = useState(emptyUSState);
 
@@ -69,6 +89,16 @@ export const Page = () => {
             </Card.Root>
 
             <Summaries usState={usState} />
+          </div>
+        </div>
+      </div>
+
+      <div className="h-[100px] bg-blue-700 opacity-80 flex items-center justify-center">
+        <div className="flex flex-col gap-y-2 text-center text-white">
+          <p className="text-sm">© 2024 Bryan Owens</p>
+          <div className="inline-flex gap-x-2">
+            <p className="text-sm">Code is open source here: </p>
+            <GitHubImage />
           </div>
         </div>
       </div>
