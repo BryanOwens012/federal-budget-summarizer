@@ -50,6 +50,7 @@ export const USStateSelect = ({
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
+    experimental_prefetchInRender: true,
   });
 
   const items = useMemo(() => {
@@ -90,7 +91,7 @@ export const USStateSelect = ({
           <SelectItem
             item={item}
             key={item.value}
-            className="hover:cursor-pointer hover:bg-gray-500"
+            className="hover:cursor-pointer hover:bg-gray-300 text-inherit"
           >
             {item.label}
           </SelectItem>

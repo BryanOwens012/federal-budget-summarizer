@@ -33,6 +33,8 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
     prompt_state = "" if request.us_state == "-" else f"""
         Focus as much as possible on the items and impacts specific to
         the state of {request.us_state} and its residents. Be as concrete as possible.
+        For example, try to use numbers, percentages, dollars, and the names of cities,
+        organizations, and people (such as politicians) of that state.
         Deprioritize items that are general, abstract, or not state-specific.
     """
 
@@ -46,4 +48,8 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
         E.g., "Allocates..." or "Provides..." or something similar.
     """
 
-    return pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}")
+    result = pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}")
+
+    print("Got budget summaries" + ('' if request.us_state == "-" else f" for {request.us_state}"))
+
+    return result

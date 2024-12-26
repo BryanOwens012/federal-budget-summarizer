@@ -43,25 +43,17 @@ export const Summaries = ({ usState }: { usState: string }) => {
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
+    experimental_prefetchInRender: true,
+    placeholderData: (previousData) => previousData,
   });
-
-  if (isLoading) {
-    return <div className="flex items-center justify-center">Loading...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center text-center text-red-500">
-        Error: {(error as Error).message}
-      </div>
-    );
-  }
 
   const [_, ...summaries] = (data ?? "").split(">>");
 
   return (
     <div className="flex items-center">
       <div className="flex flex-col gap-y-4 text-base max-w-fit">
+        {isLoading && <div>Loading...</div>}
+        {error && <div>Error: {(error as Error).message}</div>}
         {summaries.map((summary, index) => (
           <Summary key={index} text={summary} />
         ))}

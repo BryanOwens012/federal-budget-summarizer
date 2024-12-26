@@ -8,8 +8,8 @@ import USStateSelect, { emptyUSState } from "./USStateSelect";
 const budgetURL =
   "https://www.congress.gov/bill/118th-congress/house-bill/10545/text";
 
-const introParagraph = `The latest federal budget, signed on December 21, 2024, extends government funding until March 14, 2025.
-It includes provisions that could affect you, including:`;
+const introParagraph =
+  "The latest federal budget, signed on December 21, 2024, extends government funding until March 14, 2025.";
 
 export const Page = () => {
   const [usState, setUSState] = useState(emptyUSState);
