@@ -31,7 +31,7 @@ This was also a good opportunity to learn FastAPI (Python API framework) and the
 
 - Frontend: Next.js/React.js (TypeScript), Tailwind CSS, Chakra UI
 - Backend: FastAPI (Python), Postgres, OpenAI API, in-memory LRU cache
-- DevOps: This app is fully Dockerized: the services `api` (in `app/packages/backend/api`), `postgres` (in `app/packages/backend/db`), and `frontend` (in `app/packages/frontend) are each wrapped in a container. I also deployed this app to Railway (a PaaS).
+- DevOps: This app is fully Dockerized: the services `api` (in `app/packages/backend/api`), `postgres` (in `app/packages/backend/db`), and `frontend` (in `app/packages/frontend`) are each wrapped in a container. I also deployed this app to Railway (a PaaS).
 
 ### How to build
 
