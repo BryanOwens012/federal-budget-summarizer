@@ -28,7 +28,10 @@ export const Summary = ({
   const [shouldShowElaboration, setShouldShowElaboration] =
     useState<boolean>(false);
 
-  const [summary, title] = useMemo(() => text.split(titleDelimiter), [text]);
+  const [summary, title] = useMemo(
+    () => text?.split(titleDelimiter),
+    [text]
+  ) ?? ["", ""];
 
   const textClassName = classNames("text-left text-base whitespace-pre-line", {
     "text-gray-300": isFetching,
