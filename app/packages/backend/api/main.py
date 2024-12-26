@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from utils.querier import engine
 from sqlalchemy import text
 import os
+from datetime import datetime
 
 import routes.us_states
 import routes.ai
@@ -16,9 +17,9 @@ async def lifespan(_: FastAPI):
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-        print("Successfully connected to the database!")
+        print(f"{datetime.now()} Successfully connected to the database!")
     except Exception as e:
-        print(f"Failed to connect to the database: {str(e)}")
+        print(f"{datetime.now()} Failed to connect to the database: {str(e)}")
         raise
     
     yield  # This line separates startup and shutdown logic
@@ -47,7 +48,7 @@ app.add_middleware(
 app.include_router(routes.us_states.router, prefix="/v1/us-states")
 app.include_router(routes.ai.router, prefix="/v1/ai")
 
-print("Backend API started")
+print(f"{datetime.now()} Backend API started")
 
 if __name__ == "__main__":
     run()

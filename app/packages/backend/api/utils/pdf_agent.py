@@ -2,6 +2,7 @@ import pypdf
 import openai
 import tiktoken
 import os
+from datetime import datetime
 
 class PDFAgent:
     def __init__(self, pdf_path, max_tokens=4000):
@@ -45,7 +46,7 @@ class PDFAgent:
             )
             self.embeddings.append(response.data[0].embedding)
         except Exception as e:
-            print(f"Error creating embedding: {e}")
+            print(f"{datetime.now()} Error creating embedding: {e}")
             # Add a placeholder embedding if creation fails
             self.embeddings.append(np.zeros(3072))  # text-embedding-3-large dimensionality
 
@@ -99,5 +100,5 @@ class PDFAgent:
             return agent_response
             
         except Exception as e:
-            print(f"Error in API call: {e}")
+            print(f"{datetime.now()} Error in API call: {e}")
             return "Failed to process query"

@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 import os
 from utils.pdf_agent import PDFAgent
+from datetime import datetime
 
 router = APIRouter()
 
@@ -10,7 +11,7 @@ class GetBudgetSummariesRequest(BaseModel):
 
 # Because the GPT API lacks internet access, we can't ask GPT to retrieve the PDF from the internet.
 # Instead, we must embed it.
-print('Embedding budget PDF: ', os.getenv("BUDGET_PDF_PATH"))
+print(f"{datetime.now()} Embedding budget PDF: ", os.getenv("BUDGET_PDF_PATH"))
 pdf_agent = PDFAgent(
     pdf_path=os.getenv("BUDGET_PDF_PATH"),
     max_tokens=30000, # This PDF has ≈24k words, which corresponds to ≈30k tokens.
@@ -18,7 +19,7 @@ pdf_agent = PDFAgent(
 
 @router.post("/budget-summaries", response_model=str)
 async def get_budget_summaries(request: GetBudgetSummariesRequest):
-    print("Getting budget summaries" + ('' if request.us_state == "-" else f" for {request.us_state}"))
+    print(f"{datetime.now()} Getting budget summaries" + ('' if request.us_state == "-" else f" for {request.us_state}"))
 
     prompt_header = """
         You are an expert on federal law, federal agencies, Congress, and the Constitution.
@@ -50,6 +51,6 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
 
     result = pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}")
 
-    print("Got budget summaries" + ('' if request.us_state == "-" else f" for {request.us_state}"))
+    print(f"{datetime.now()} Got budget summaries" + ('' if request.us_state == "-" else f" for {request.us_state}"))
 
     return result
