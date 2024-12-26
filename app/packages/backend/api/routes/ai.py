@@ -19,7 +19,7 @@ mostLikelyUSStates = ["California", "Washington", "New York", "New Jersey", "Tex
 
 summaryDelimiter = "summary>>"
 titleDelimiter = "title>>"
-cacheCapacity = 100
+cacheCapacity = 500
 
 # TODO: Replace with Redis cache
 summaries_by_us_state_cache = LRUCache(cacheCapacity)
