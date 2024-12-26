@@ -71,8 +71,6 @@ export const Elaboration = ({
         <p>Error getting elaboration from ChatGPT: {error.message}</p>
       ) : isFetching ? (
         <p>Getting elaboration from ChatGPT...</p>
-      ) : data ? (
-        <p>More about this:</p>
       ) : (
         <></>
       )}

@@ -17,7 +17,7 @@ const CapitolImage = () => {
     <Box position="relative" width="100vw" height="100%" overflow="visible">
       <Image
         src="capitol_building.webp"
-        alt="U.S. Capitol, where Congress meets"
+        alt="U.S. Capitol, where Congress meets. Source: https://www.aoc.gov/explore-capitol-campus/buildings-grounds/capitol-building"
         width="100%"
         height="100%"
         objectFit="cover"
