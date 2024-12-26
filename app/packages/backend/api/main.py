@@ -39,9 +39,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
+         # Allow 3001, in case we want to run the frontend both in Docker ($ yarn build && yarn start)
+         # and by itself ($ yarn run dev), simultaneously
+        "http://localhost:3001",
         "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
         "http://0.0.0.0:3000",
         "http://frontend:3000",  # Docker service name
+        "http://frontend:3001",
         os.getenv("NEXT_PUBLIC_RAILWAY_FE_URL", "http://localhost:3000"),
         os.getenv("RAILWAY_PUBLIC_DOMAIN", "http://localhost:3000"),
         os.getenv("RAILWAY_PRIVATE_DOMAIN", "http://localhost:3000"),

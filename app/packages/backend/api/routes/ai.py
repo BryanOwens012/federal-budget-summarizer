@@ -14,7 +14,7 @@ class GetBudgetElaborationRequest(BaseModel):
     summary: str
 
 emptyUSState = "-"
-mostLikelyUSStates = ["California", "Washington", "New York", "New Jersey", "Texas", "Florida", "Illinois"]
+mostLikelyUSStates = ["California", "Washington", "New York", "New Jersey", "Texas", "Florida", "Illinois", "Pennsylvania", "Virginia", "Maryland", "Massachusetts"]
 
 # TODO: Replace with Redis cache
 summaries_by_us_state_cache = dict[str, str]()

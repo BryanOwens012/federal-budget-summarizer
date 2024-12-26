@@ -57,7 +57,7 @@ export const Summaries = ({ usState }: { usState: string }) => {
         {error ? (
           <p>Error getting response from ChatGPT: {error.message}</p>
         ) : isFetching ? (
-          <p>Getting response from ChatGPT...</p>
+          <p className="text-gray-300">Getting response from ChatGPT...</p>
         ) : data ? (
           <p>Here's how the budget affects you:</p>
         ) : (

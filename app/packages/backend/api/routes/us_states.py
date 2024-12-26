@@ -11,6 +11,7 @@ router = APIRouter()
 class USStatesList(pydantic.BaseModel):
     us_states: List[UsState]
 
+# TODO: Replace with Redis cache
 us_states_cache = USStatesList(us_states = [])
 
 async def init_caches():
