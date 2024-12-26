@@ -38,3 +38,6 @@ migrate-up:
 
 migrate-down:
   cd packages/backend/db && migrate -database $POSTGRES_DB_URL_LOCAL -path migrations down
+
+add-snippet snippet-name:
+  cd packages/frontend && yarn chakra snippet add {{snippet-name}}

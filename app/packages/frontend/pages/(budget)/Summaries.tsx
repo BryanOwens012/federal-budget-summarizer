@@ -5,7 +5,7 @@ import { apiURL, apiVersion } from "../_app";
 import { Summary } from "./Summary";
 
 type ListBudgetSummariesResponse = string;
-const summaryDelimiter = ">>";
+const summaryDelimiter = "summary>>";
 
 const listBudgetSummaries = async (
   usState: string
@@ -64,9 +64,11 @@ export const Summaries = ({ usState }: { usState: string }) => {
           <></>
         )}
 
-        {summaries.map((summary, index) => (
-          <Summary key={index} text={summary} isFetching={isFetching} />
-        ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
+          {summaries.map((summary, index) => (
+            <Summary key={index} text={summary} isFetching={isFetching} />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -16,6 +16,9 @@ class GetBudgetElaborationRequest(BaseModel):
 emptyUSState = "-"
 mostLikelyUSStates = ["California", "Washington", "New York", "New Jersey", "Texas", "Florida", "Illinois", "Pennsylvania", "Virginia", "Maryland", "Massachusetts"]
 
+summaryDelimiter = "summary>>"
+titleDelimiter = "title>>"
+
 # TODO: Replace with Redis cache
 summaries_by_us_state_cache = dict[str, str]()
 elaboration_by_summary_cache = dict[str, str]()
@@ -80,15 +83,20 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
         Deprioritize items that are general, abstract, or not state-specific.
     """
 
-    prompt_footer = """
+    prompt_footer = f"""
         Structure your answer in the following way:
-        A bullet-pointed list of the 5 most salient provisions of the budget, in order of importance.
+        A bullet-pointed list of the 6 most salient provisions of the budget, in order of importance.
 
-        To delimit each bullet point, its text should begin with the string ">>"
+        To delimit each bullet point, its text should begin with the string "{summaryDelimiter}"
         (but without the quotation marks that I added there; don't include a hyphen or other different delimiter).
         Don't begin the sentence with "The budget..." or "The bill" or something similar.
         Instead, please jump right into the content.
-        E.g., "Allocates..." or "Provides..." or something similar.
+        E.g., a verb like "Allocates..." or "Provides..." or something similar.
+
+        At the end of each bullet point, summarize the bullet point in at most 5 words, and prepend this summary with the string "{titleDelimiter}"
+        (but without the quotation marks that I added there; don't include a hyphen or other different delimiter).
+        This summary should follow the same format as the bullet point itself, for example, it should begin with a verb.
+        Also, this summary should not end with a period.
 
         Split into paragraphs if necessary. Make a line break between each paragraph using exactly one occurence of the usual backslash-n string.
         Don't add too much space or newlines between paragraphs.

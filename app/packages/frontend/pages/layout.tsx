@@ -3,7 +3,7 @@ import { ReactNode, Suspense } from "react";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="h-screen bg-gray">
+    <div className="h-screen bg-black">
       <Suspense fallback={<Spinner />}>{children}</Suspense>
     </div>
   );

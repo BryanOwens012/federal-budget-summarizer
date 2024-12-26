@@ -1,5 +1,11 @@
+"use client";
+
+import { Card } from "@chakra-ui/react";
 import classNames from "classnames";
+import { useMemo } from "react";
 import Elaboration from "./Elaboration";
+
+const titleDelimiter = "title>>";
 
 export const Summary = ({
   text,
@@ -8,20 +14,33 @@ export const Summary = ({
   text: string;
   isFetching: boolean;
 }) => {
+  const [summary, title] = useMemo(() => text.split(titleDelimiter), [text]);
+
+  const textClassName = classNames("text-left whitespace-pre-line", {
+    "text-gray-300": isFetching,
+    "text-black": !isFetching,
+  });
+
   return (
-    <div
-      className={classNames("text-left p-4 border-2 flex flex-col gap-y-2", {
-        "border-gray-300 text-gray-300": isFetching,
-        "border-black text-black": !isFetching,
-      })}
-    >
-      <p className="whitespace-pre-line">{text}</p>
-      <Elaboration
-        summary={text}
-        shouldShow={!!text}
-        isSummaryFetching={isFetching}
-      />
-    </div>
+    <Card.Root>
+      <Card.Body gap="2">
+        <Card.Title mt="2" className={textClassName}>
+          {title}
+        </Card.Title>
+        <Card.Description>
+          <div
+            className={classNames("p-4 flex flex-col gap-y-2", textClassName)}
+          >
+            <p>{summary}</p>
+            <Elaboration
+              summary={summary}
+              shouldShow={!!text}
+              isSummaryFetching={isFetching}
+            />
+          </div>
+        </Card.Description>
+      </Card.Body>
+    </Card.Root>
   );
 };
 
