@@ -83,7 +83,7 @@ export const Elaboration = ({
         )}
       </div>
 
-      <p className="whitespace-pre-line">{data}</p>
+      <div className="whitespace-pre-line">{data}</div>
     </div>
   );
 };

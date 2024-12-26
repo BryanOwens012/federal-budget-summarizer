@@ -73,9 +73,9 @@ export const Page = () => {
               {" mean for you?"}
             </h1>
 
-            <p className="text-base whitespace-pre-line text-blue-600 font-semibold">
+            <div className="text-base whitespace-pre-line text-blue-600 font-semibold">
               {introParagraph}
-            </p>
+            </div>
 
             <Card.Root className="border-2 h-full opacity-95">
               <Card.Body className="flex flex-col gap-2">
@@ -94,10 +94,10 @@ export const Page = () => {
       </div>
 
       <div className="h-[100px] bg-blue-700 opacity-80 flex items-center justify-center">
-        <div className="flex flex-col gap-y-2 text-center text-white">
-          <p className="text-sm">© 2024 Bryan Owens</p>
+        <div className="flex flex-col gap-y-2 text-center text-white text-sm">
+          <div>© 2024 Bryan Owens</div>
           <div className="inline-flex gap-x-2">
-            <p className="text-sm">Code is open source here: </p>
+            <div>Code is open source here: </div>
             <GitHubImage />
           </div>
         </div>
