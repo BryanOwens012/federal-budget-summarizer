@@ -36,6 +36,9 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
         the state of {request.us_state} and its residents. Be as concrete as possible.
         For example, try to use numbers, percentages, dollars, and the names of cities,
         organizations, and people (such as politicians) of that state.
+        Make sure that the numbers are correct as applicable to the state.
+        For example, if the budget allocates $1 billion to a program to fund changes on a national scale (not state-specific),
+        it would not be accurate to claim that the budget allocates $1 billion to the state of {request.us_state}.
         Deprioritize items that are general, abstract, or not state-specific.
     """
 
