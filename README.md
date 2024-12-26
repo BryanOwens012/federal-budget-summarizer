@@ -12,7 +12,7 @@ I built this app from scratch to public deployment in less than a week. Fun!
 
 I've been interested in law for many years. These days, I keep up constantly with legal news (such as cases involving SCOTUS or the U.S. government), read law school textbooks, and study the Series 65 and LSAT for fun.
 
-A week ago, as I was reading social media reactions to the new budget and discussing, I realized that Americans have a huge unmet need: they want to know how laws will impact them, but they either don't have the time or don't have the legal training to read the entire primary source. Secondary sources like the news media can help, but they can be suboptimal.
+A week ago, as I was reading social media reactions to the new budget and discussing with people, I realized that Americans have a huge unmet need: they want to know how laws will impact them, but they either don't have the time or don't have the legal training to read the entire primary source. Secondary sources like the news media can help, but they can be suboptimal.
 
 Indeed, the U.S.'s legal system is so complex that there are even towns where it's illegal to carry an ice cream cone in your back pocket. Luckily, those particular laws are no longer enforced, but they epitomize the issue.
 
