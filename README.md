@@ -33,7 +33,7 @@ This was also a good opportunity to learn FastAPI (Python API framework) and the
 - Backend: FastAPI (Python), Postgres, OpenAI API, in-memory LRU cache
 - DevOps: This app is fully Dockerized: the services `api` (in `app/packages/backend/api`), `postgres` (in `app/packages/backend/db`), and `frontend` (in `app/packages/frontend`) are each wrapped in a container. I also deployed this app to Railway (a PaaS).
 
-Since the OpenAI API doesn't have internet access, and the budget was passed after its latest knowledge cutoff date, I tokenized the budget PDF and made embeddings with which to query the PDF.
+Since the OpenAI API doesn't have internet access, and the budget was passed after OpenAI's latest knowledge cutoff date, I tokenized the budget PDF and made embeddings with which to query the PDF.
 
 ### How to build
 
