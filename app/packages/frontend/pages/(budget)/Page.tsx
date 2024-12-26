@@ -82,9 +82,9 @@ export const Page = () => {
                 <Card.Title className={classNames("mt-2 px-6 font-semibold")}>
                   Select your state to see how the budget affects you:
                 </Card.Title>
-                <Card.Description className="flex flex-col items-center mt-4">
+                <div className="flex flex-col items-center mt-4">
                   <USStateSelect setSelected={setUSState} />
-                </Card.Description>
+                </div>
               </Card.Body>
             </Card.Root>
 
