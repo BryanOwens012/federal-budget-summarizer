@@ -1,5 +1,6 @@
 "use client";
 
+import { Alert } from "@/components/ui/alert";
 import { useQuery } from "@tanstack/react-query";
 import { apiURL, apiVersion } from "../_app";
 import { Summary } from "./Summary";
@@ -54,15 +55,18 @@ export const Summaries = ({ usState }: { usState: string }) => {
   return (
     <div className="flex items-center">
       <div className="flex flex-col gap-y-4 text-base max-w-fit items-center">
-        {error ? (
-          <p>Error getting response from ChatGPT: {error.message}</p>
-        ) : isFetching ? (
-          <p className="text-gray-300">Getting response from ChatGPT...</p>
-        ) : data ? (
-          <p>Here's how the budget affects you:</p>
-        ) : (
-          <></>
-        )}
+        <div className="flex flex-col items-center">
+          {error ? (
+            <Alert
+              status="error"
+              title={`Error getting response from ChatGPT: ${error.message}`}
+            />
+          ) : isFetching ? (
+            <Alert status="info" title="Asking ChatGPT..." />
+          ) : (
+            <></>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
           {summaries.map((summary, index) => (

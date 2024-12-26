@@ -83,6 +83,7 @@ export const USStateSelect = ({
       variant="outline"
       defaultValue={[emptyUSState]}
       onValueChange={(item) => setSelected(item.value[0])}
+      className="border-2 rounded-lg px-4"
     >
       <SelectTrigger>
         <SelectValueText placeholder="Select state" />

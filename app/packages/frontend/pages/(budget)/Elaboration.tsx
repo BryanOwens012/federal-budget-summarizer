@@ -1,3 +1,6 @@
+"use client";
+
+import { Alert } from "@/components/ui/alert";
 import { useQuery } from "@tanstack/react-query";
 import classNames from "classnames";
 import { apiURL, apiVersion } from "../_app";
@@ -62,18 +65,23 @@ export const Elaboration = ({
 
   return (
     <div
-      className={classNames("flex flex-col gap-y-8 text-left", {
+      className={classNames("flex flex-col text-left", {
         "text-gray-300": shouldGrayOut,
         "text-black": !shouldGrayOut,
       })}
     >
-      {error ? (
-        <p>Error getting elaboration from ChatGPT: {error.message}</p>
-      ) : isFetching ? (
-        <p>Getting elaboration from ChatGPT...</p>
-      ) : (
-        <></>
-      )}
+      <div className="flex flex-col items-center mb-3">
+        {error ? (
+          <Alert
+            status="error"
+            title={`Error getting response from ChatGPT: ${error.message}`}
+          />
+        ) : isFetching ? (
+          <Alert status="info" title="Asking ChatGPT..." />
+        ) : (
+          <></>
+        )}
+      </div>
 
       <p className="whitespace-pre-line">{data}</p>
     </div>

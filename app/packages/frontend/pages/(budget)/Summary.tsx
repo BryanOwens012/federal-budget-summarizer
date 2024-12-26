@@ -34,11 +34,10 @@ export const Summary = ({
   });
 
   return (
-    <Card.Root ref={cardRootRef} className="border-2">
-      <Card.Body gap="2">
+    <Card.Root ref={cardRootRef} className="border-2 h-full">
+      <Card.Body className="flex flex-col gap-2">
         <Card.Title
-          mt="2"
-          className={classNames(textClassName, "px-6 font-semibold")}
+          className={classNames(textClassName, "mt-2 px-6 font-semibold")}
         >
           {title}
         </Card.Title>
@@ -52,7 +51,7 @@ export const Summary = ({
             {summary}
           </div>
         </Card.Description>
-        <Card.Footer className="justify-end">
+        <Card.Footer className="flex justify-end">
           <AccordionRoot
             collapsible
             value={shouldShowElaboration ? [elaborationAccordionValue] : []}
