@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from db.models import UsState
-from typing import List, Union
+from typing import List
 import db.us_states
 import pydantic
 from utils.querier import get_conn

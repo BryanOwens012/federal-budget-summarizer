@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import os
 from utils.pdf_agent import PDFAgent
 from datetime import datetime
+import re
 
 router = APIRouter()
 
@@ -40,6 +41,14 @@ async def init_elaboration_by_summary_cache():
 async def init_caches():
     await init_summaries_by_state_cache()
     await init_elaboration_by_summary_cache()
+
+def clean_result(result: str) -> str:
+    """
+    Sometimes, the response will include an extraneous \ character somewhere,
+    so we need to remove it.
+    """
+    pattern = r"\\(?!n)"
+    return re.sub(pattern, '', result)
 
 @router.post("/budget-summaries", response_model=str)
 async def get_budget_summaries(request: GetBudgetSummariesRequest):
@@ -85,7 +94,7 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
         Don't add too much space or newlines between paragraphs.
     """
 
-    result = pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}")
+    result = clean_result(pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}"))
     summaries_by_us_state_cache[request.us_state] = result
 
     print(f"{datetime.now()} Got budget summaries" + ('' if request.us_state == emptyUSState else f" for {request.us_state}"))
@@ -128,7 +137,7 @@ async def get_budget_elaboration(request: GetBudgetElaborationRequest):
         Don't add too much space or newlines between paragraphs.
     """
 
-    result = pdf_agent.query(f"{prompt_header}{prompt_summary}{prompt_footer}")
+    result = clean_result(pdf_agent.query(f"{prompt_header}{prompt_summary}{prompt_footer}"))
     elaboration_by_summary_cache[request.summary] = result
 
     print(f"{datetime.now()} Got budget elaboration for \"{summary_preview}...\"")
