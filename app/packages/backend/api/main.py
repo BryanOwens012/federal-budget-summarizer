@@ -21,6 +21,14 @@ async def lifespan(_: FastAPI):
     except Exception as e:
         print(f"{datetime.now()} Failed to connect to the database: {str(e)}")
         raise
+
+    # Startup: Initialize caches
+    try:
+        routes.us_states.init_caches()
+        routes.ai.init_caches()
+    except Exception as e:
+        print(f"{datetime.now()} Failed to initialize caches: {str(e)}")
+        raise
     
     yield  # This line separates startup and shutdown logic
 

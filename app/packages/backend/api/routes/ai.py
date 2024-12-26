@@ -41,8 +41,6 @@ async def init_caches():
     await init_summaries_by_state_cache()
     await init_elaboration_by_summary_cache()
 
-init_caches()
-
 @router.post("/budget-summaries", response_model=str)
 async def get_budget_summaries(request: GetBudgetSummariesRequest):
     print(f"{datetime.now()} Getting budget summaries" + ('' if request.us_state == emptyUSState else f" for {request.us_state}"))

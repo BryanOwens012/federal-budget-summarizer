@@ -17,8 +17,6 @@ async def init_caches():
     print(f"{datetime.now()} Pre-caching U.S. states")
     us_states_cache.us_states = await list_us_states()
 
-init_caches()
-
 @router.get("", response_model=USStatesList)
 async def list_us_states():
     print(f"{datetime.now()} Listing U.S. states")
