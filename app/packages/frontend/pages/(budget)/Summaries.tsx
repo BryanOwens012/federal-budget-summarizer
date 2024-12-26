@@ -35,7 +35,8 @@ const listBudgetSummaries = async (
 };
 
 export const Summaries = ({ usState }: { usState: string }) => {
-  const { data, isLoading, error } = useQuery<ListBudgetSummariesResponse>({
+  // Use `isFetching` instead of `isLoading`, because `isLoading` is always false if the placeholder data has been cached
+  const { data, error, isFetching } = useQuery<ListBudgetSummariesResponse>({
     queryKey: ["list-budget-summaries", usState],
     queryFn: () => listBudgetSummaries(usState),
 
@@ -52,10 +53,16 @@ export const Summaries = ({ usState }: { usState: string }) => {
   return (
     <div className="flex items-center">
       <div className="flex flex-col gap-y-4 text-base max-w-fit">
-        {isLoading && <div>Loading...</div>}
-        {error && <div>Error: {(error as Error).message}</div>}
+        {error ? (
+          <div>Error: {error.message}</div>
+        ) : isFetching ? (
+          <div>Generating with ChatGPT...</div>
+        ) : (
+          <div>Here's how the budget affects you:</div>
+        )}
+
         {summaries.map((summary, index) => (
-          <Summary key={index} text={summary} />
+          <Summary key={index} text={summary} isFetching={isFetching} />
         ))}
       </div>
     </div>

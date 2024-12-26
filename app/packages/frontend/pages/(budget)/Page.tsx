@@ -27,7 +27,7 @@ export const Page = () => {
           </h1>
           <p className="text-base whitespace-pre-wrap">{introParagraph}</p>
           <div>
-            Select your state to see how the budget affects you:
+            Select your state:
             <USStateSelect setSelected={setUSState} />
           </div>
           <Summaries usState={usState} />

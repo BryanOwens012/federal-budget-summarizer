@@ -4,7 +4,6 @@ import { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone", // Generate a standalone app for Railway
   reactStrictMode: true, // Enforce React strict mode
-  swcMinify: true, // Enable SWC-based minification for faster builds
   env: {
     API_URL: process.env.NEXT_PUBLIC_API_URL, // Custom environment variable
   },

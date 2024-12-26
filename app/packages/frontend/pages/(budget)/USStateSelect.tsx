@@ -55,13 +55,14 @@ export const USStateSelect = ({
 
   const items = useMemo(() => {
     const emptyUSStateItem = {
-      label: error ? "Error" : isLoading ? "Loading..." : emptyUSState,
+      label: error ? "Error" : isLoading ? "Loading..." : "(All states)",
       value: emptyUSState,
     };
 
     const stateNames = (data?.us_states ?? [])
       .filter((state) => state.name)
-      .map((state) => state.name!);
+      .map((state) => state.name!)
+      .sort((a, b) => a.localeCompare(b));
 
     return createListCollection({
       items: [
@@ -72,7 +73,7 @@ export const USStateSelect = ({
         })),
       ],
     });
-  }, [data]);
+  }, [error, isLoading, emptyUSState, data]);
 
   return (
     <SelectRoot
