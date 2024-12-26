@@ -80,7 +80,8 @@ export const Page = () => {
             <Card.Root className="border-2 h-full opacity-95">
               <Card.Body className="flex flex-col gap-2">
                 <Card.Title className={classNames("mt-2 px-6 font-semibold")}>
-                  Select your state to see how the budget affects you:
+                  Select your state, and then ChatGPT will describe how the
+                  budget affects you:
                 </Card.Title>
                 <div className="flex flex-col items-center mt-4">
                   <USStateSelect setSelected={setUSState} />
