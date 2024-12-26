@@ -132,7 +132,7 @@ async def get_budget_elaboration(request: GetBudgetElaborationRequest):
 
     prompt_footer = f"""
         Now, please give me a long-form (7-10 sentences) elaboration of that summary.
-        Including its motivations, causes, implications, supporters (names of organizations and people), and future projected changes.
+        Including its motivations, causes, implications, supporters and opponents (names of organizations and people), and future projected changes.
         Be as specific as possible, based on your knowledge of this budget and what you can find in your knowledge base and training data.
 
         Use layman's terms. Minimize jargon, and use simple language.
