@@ -38,5 +38,6 @@ This was also a good opportunity to learn FastAPI (Python API framework) and the
 - Install docker
 - Install the Just command runner: `$ brew install just`
 - If you eventually plan to develop in this repo, install the sqlc DB querier codegen: `$ brew install sqlc`
+- Rename `app/.env.tmpl` to `.env` and fill in the correct values
 - In `app/`, run `$ just up` (this calls `docker-compose` with a few options)
 - After the build completes, visit the app at `localhost:3000`
