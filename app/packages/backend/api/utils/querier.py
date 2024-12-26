@@ -12,7 +12,7 @@ try:
     auth, rest = DATABASE_URL.split("@")
     # Split host part into host and database
     host, db_name = rest.split("/")
-    print(f"{datetime.now()} Attempting to connect to database: {DATABASE_URL}")  # Remove query params
+    print(f"{datetime.now()} Attempting to connect to database: {db_name}")  # Remove query params
 except Exception as e:
     print(f"{datetime.now()} Error parsing DATABASE_URL: {e}")
 

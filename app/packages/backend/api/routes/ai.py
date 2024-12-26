@@ -4,6 +4,7 @@ import os
 from utils.pdf_agent import PDFAgent
 from datetime import datetime
 import re
+from utils.lru_cache import LRUCache
 
 router = APIRouter()
 
@@ -18,10 +19,11 @@ mostLikelyUSStates = ["California", "Washington", "New York", "New Jersey", "Tex
 
 summaryDelimiter = "summary>>"
 titleDelimiter = "title>>"
+cacheCapacity = 100
 
 # TODO: Replace with Redis cache
-summaries_by_us_state_cache = dict[str, str]()
-elaboration_by_summary_cache = dict[str, str]()
+summaries_by_us_state_cache = LRUCache(cacheCapacity)
+elaboration_by_summary_cache = LRUCache(cacheCapacity)
 
 # Because the GPT API lacks internet access, we can't ask GPT to retrieve the PDF from the internet.
 # Instead, we must parse and embed it.
@@ -34,12 +36,18 @@ pdf_agent = PDFAgent(
 async def init_summaries_by_state_cache():
     for us_state in mostLikelyUSStates:
         print(f"{datetime.now()} Pre-caching budget summaries for {us_state}")
-        summaries_by_us_state_cache[us_state] = await get_budget_summaries(GetBudgetSummariesRequest(us_state=us_state))
+
+        result = await get_budget_summaries(GetBudgetSummariesRequest(us_state=us_state))
+        summaries_by_us_state_cache.set(us_state, result)
 
 async def init_elaboration_by_summary_cache():
-    for us_state, summary in summaries_by_us_state_cache.items():
-        print(f"{datetime.now()} Pre-caching budget elaboration for {us_state}")
-        elaboration_by_summary_cache[summary] = await get_budget_elaboration(GetBudgetElaborationRequest(summary=summary))
+    for us_state, summaries in summaries_by_us_state_cache.export():
+        print(f"{datetime.now()} Pre-caching budget elaborations for {us_state}")
+
+        for summary in summaries.split(summaryDelimiter)[1:]:
+            parsedSummary = summary.split(titleDelimiter)[0]
+            result = await get_budget_elaboration(GetBudgetElaborationRequest(summary=parsedSummary))
+            elaboration_by_summary_cache.set(parsedSummary, result)
 
 async def init_caches():
     await init_summaries_by_state_cache()
@@ -57,9 +65,10 @@ def clean_result(result: str) -> str:
 async def get_budget_summaries(request: GetBudgetSummariesRequest):
     print(f"{datetime.now()} Getting budget summaries" + ('' if request.us_state == emptyUSState else f" for {request.us_state}"))
 
-    if request.us_state in summaries_by_us_state_cache:
+    cached_value = summaries_by_us_state_cache.get(request.us_state)
+    if cached_value:
         print(f"{datetime.now()} Found budget summaries for {request.us_state} in cache")
-        return summaries_by_us_state_cache[request.us_state]
+        return cached_value
 
     prompt_header = """
         You are an expert on federal law, federal agencies, Congress, and the Constitution.
@@ -103,7 +112,7 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
     """
 
     result = clean_result(pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}"))
-    summaries_by_us_state_cache[request.us_state] = result
+    summaries_by_us_state_cache.set(request.us_state, result)
 
     print(f"{datetime.now()} Got budget summaries" + ('' if request.us_state == emptyUSState else f" for {request.us_state}"))
 
@@ -114,9 +123,10 @@ async def get_budget_elaboration(request: GetBudgetElaborationRequest):
     summary_preview = request.summary[:20]
     print(f"{datetime.now()} Getting budget elaboration for \"{summary_preview}...\"")
 
-    if request.summary in elaboration_by_summary_cache:
+    cached_value = elaboration_by_summary_cache.get(request.summary)
+    if cached_value:
         print(f"{datetime.now()} Found budget elaboration for \"{summary_preview}\" in cache")
-        return elaboration_by_summary_cache[request.summary]
+        return cached_value
 
     prompt_header = """
         You are an expert on federal law, federal agencies, Congress, and the Constitution.
@@ -146,7 +156,7 @@ async def get_budget_elaboration(request: GetBudgetElaborationRequest):
     """
 
     result = clean_result(pdf_agent.query(f"{prompt_header}{prompt_summary}{prompt_footer}"))
-    elaboration_by_summary_cache[request.summary] = result
+    elaboration_by_summary_cache.set(request.summary, result)
 
     print(f"{datetime.now()} Got budget elaboration for \"{summary_preview}...\"")
 
