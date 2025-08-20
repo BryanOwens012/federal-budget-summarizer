@@ -8,6 +8,23 @@ There are 2 ways to access this app:
 
 I built this app from scratch to public deployment in less than a week. Fun!
 
+### Tech stack
+
+- Frontend: Next.js/React.js (TypeScript), Tailwind CSS, Chakra UI
+- Backend: FastAPI (Python), Postgres, OpenAI API, in-memory LRU cache
+- DevOps: This app is fully Dockerized: the services `api` (in `app/packages/backend/api`), `postgres` (in `app/packages/backend/db`), and `frontend` (in `app/packages/frontend`) are each wrapped in a container. I also deployed this app to Railway (a PaaS).
+
+Since the OpenAI API doesn't have internet access, and the budget was passed after OpenAI's latest knowledge cutoff date, I tokenized the budget PDF and made embeddings with which to query the PDF.
+
+### How to build
+
+- Install docker
+- Install the Just command runner: `$ brew install just`
+- If you eventually plan to develop in this repo, install the sqlc DB querier codegen: `$ brew install sqlc`
+- Rename `app/.env.tmpl` to `.env` and fill in the correct values
+- In `app/`, run `$ just up` (this calls `docker-compose` with a few options)
+- After the build completes, visit the app at `localhost:3000`
+
 ### Motivation
 
 I've been interested in law for many years. These days, I keep up constantly with legal news (such as cases involving SCOTUS or the U.S. government), read law school textbooks, and study the Series 65 and LSAT for fun.
@@ -26,20 +43,3 @@ Today, for simplicity, the app limits the user to choosing a state. Potential fu
 - Various UI/UX improvements
 
 This was also a good opportunity to learn FastAPI (Python API framework) and the OpenAI API.
-
-### Tech stack
-
-- Frontend: Next.js/React.js (TypeScript), Tailwind CSS, Chakra UI
-- Backend: FastAPI (Python), Postgres, OpenAI API, in-memory LRU cache
-- DevOps: This app is fully Dockerized: the services `api` (in `app/packages/backend/api`), `postgres` (in `app/packages/backend/db`), and `frontend` (in `app/packages/frontend`) are each wrapped in a container. I also deployed this app to Railway (a PaaS).
-
-Since the OpenAI API doesn't have internet access, and the budget was passed after OpenAI's latest knowledge cutoff date, I tokenized the budget PDF and made embeddings with which to query the PDF.
-
-### How to build
-
-- Install docker
-- Install the Just command runner: `$ brew install just`
-- If you eventually plan to develop in this repo, install the sqlc DB querier codegen: `$ brew install sqlc`
-- Rename `app/.env.tmpl` to `.env` and fill in the correct values
-- In `app/`, run `$ just up` (this calls `docker-compose` with a few options)
-- After the build completes, visit the app at `localhost:3000`
