@@ -25,9 +25,9 @@ Since the OpenAI API doesn't have internet access, and the budget was passed aft
 - In `app/`, run `$ just up` (this calls `docker-compose` with a few options)
 - After the build completes, visit the app at `localhost:3000`
 
-### Motivation
+### Motivation (Dec 2024)
 
-I've been interested in law for many years. These days, I keep up constantly with legal news (such as cases involving SCOTUS or the U.S. government), read law school textbooks, and study the Series 65 and LSAT for fun.
+I've been interested in law for many years. These days, I keep up with legal news (such as cases involving SCOTUS or the U.S. government), read law school textbooks, and study the Series 65 and LSAT for fun.
 
 A week ago, as I was reading social media reactions to the new budget and discussing with people, I realized that Americans have a huge unmet need: they want to know how laws will impact them, but they either don't have the time or don't have the legal training to read the entire primary source. Secondary sources like the news media can help, but they can be suboptimal.
 
