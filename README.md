@@ -6,7 +6,9 @@ There are 2 ways to access this app:
 1. I deployed the app on Railway, here: https://federal-budget-summarizer.up.railway.app/
 2. You can pull this repo to run the app on localhost
 
-I challenged myself to build this app from scratch to public deployment within a week, with no AI-generated code. Fun!
+I challenged myself to manually build this app from scratch to public deployment within a week. Fun!
+
+** This project involves no AI-generated code **
 
 ### Tech stack
 
