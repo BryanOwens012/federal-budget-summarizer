@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 # Put build files in /app (not /frontend)
 WORKDIR /app
@@ -20,7 +20,7 @@ COPY . .
 RUN yarn build
 
 # Production stage
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
 
 # Put build files in /app (not /frontend)
 WORKDIR /app
