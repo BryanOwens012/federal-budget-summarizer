@@ -77,7 +77,6 @@ export const Elaboration = ({
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
-    experimental_prefetchInRender: true,
     placeholderData: (previousData) => previousData,
   });
 

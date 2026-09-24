@@ -50,7 +50,6 @@ export const USStateSelect = ({
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
-    experimental_prefetchInRender: true,
   });
 
   const items = useMemo(() => {
