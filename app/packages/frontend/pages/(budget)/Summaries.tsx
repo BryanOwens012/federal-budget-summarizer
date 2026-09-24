@@ -46,7 +46,6 @@ export const Summaries = ({ usState }: { usState: string }) => {
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
-    experimental_prefetchInRender: true,
     placeholderData: (previousData) => previousData,
   });
 
