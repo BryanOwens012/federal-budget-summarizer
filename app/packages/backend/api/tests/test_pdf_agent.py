@@ -35,14 +35,20 @@ def make_response(content):
 class FakeClient:
     """Models list results and chat outcomes are consumed in order; an exception outcome is raised"""
 
-    def __init__(self, model_lists, outcomes):
+    def __init__(self, model_lists, outcomes, can_embed=True):
         self.model_lists = list(model_lists)
         self.outcomes = list(outcomes)
         self.list_calls = 0
         self.create_calls = []
         self.models = SimpleNamespace(list=self._list_models)
         self.chat = SimpleNamespace(completions=SimpleNamespace(create=self._create))
-        self.embeddings = SimpleNamespace(create=lambda **_: SimpleNamespace(data=[SimpleNamespace(embedding=[0.0])]))
+        self.embeddings = SimpleNamespace(create=self._embed if can_embed else self._fail_to_embed)
+
+    def _embed(self, **_):
+        return SimpleNamespace(data=[SimpleNamespace(embedding=[1.0])])
+
+    def _fail_to_embed(self, **_):
+        raise RuntimeError("embeddings unavailable")
 
     def _list_models(self):
         self.list_calls += 1
@@ -56,6 +62,8 @@ class FakeClient:
             raise outcome
         return outcome
 
+SYSTEM_EMBEDDING = [0.0]
+
 def make_agent(client):
     agent = pdf_agent_module.PDFAgent.__new__(pdf_agent_module.PDFAgent)
     agent.client = client
@@ -64,13 +72,14 @@ def make_agent(client):
     agent.max_tokens = 10**6
     agent.tokenizer = SimpleNamespace(encode=lambda text: text.split())
     agent.messages = [{"role": "system", "content": "system prompt"}]
-    agent.embeddings = [[0.0]]
+    agent.embeddings = [SYSTEM_EMBEDDING]
     return agent
 
 class PDFAgentQueryTest(unittest.TestCase):
     def assert_history_restored(self, agent):
         self.assertEqual(agent.messages, [{"role": "system", "content": "system prompt"}])
-        self.assertEqual(len(agent.embeddings), 1)
+        self.assertEqual(agent.embeddings, [SYSTEM_EMBEDDING])
+        self.assertIs(agent.embeddings[0], SYSTEM_EMBEDDING)
 
     def test_selects_once_and_reuses_the_model(self):
         client = FakeClient([["gpt-5-nano", "gpt-5.4-nano"]], [make_response("one"), make_response("two")])
@@ -100,7 +109,7 @@ class PDFAgentQueryTest(unittest.TestCase):
         client = FakeClient([["gpt-5-nano"]], [FakeNotFoundError(), FakeNotFoundError()])
         agent = make_agent(client)
 
-        self.assertEqual(agent.query("question"), pdf_agent_module.QUERY_FAILED_MESSAGE)
+        self.assertIsNone(agent.query("question"))
         self.assertEqual(len(client.create_calls), 2)
         self.assert_history_restored(agent)
 
@@ -108,7 +117,7 @@ class PDFAgentQueryTest(unittest.TestCase):
         client = FakeClient([["text-embedding-3-large"], ["gpt-5-nano"]], [make_response("answer")])
         agent = make_agent(client)
 
-        self.assertEqual(agent.query("question"), pdf_agent_module.QUERY_FAILED_MESSAGE)
+        self.assertIsNone(agent.query("question"))
         self.assertIsNone(agent.chat_model)
         self.assertEqual(client.create_calls, [])
         self.assert_history_restored(agent)
@@ -134,7 +143,7 @@ class PDFAgentQueryTest(unittest.TestCase):
         client = FakeClient([["gpt-5-nano"]], [FakeBadRequestError("context_length_exceeded", param="messages")])
         agent = make_agent(client)
 
-        self.assertEqual(agent.query("question"), pdf_agent_module.QUERY_FAILED_MESSAGE)
+        self.assertIsNone(agent.query("question"))
         self.assertEqual(len(client.create_calls), 1)
         self.assertTrue(agent.can_set_reasoning_effort)
         self.assert_history_restored(agent)
@@ -153,6 +162,39 @@ class PDFAgentQueryTest(unittest.TestCase):
         self.assertEqual(agent.query("question"), "answer")
         self.assertEqual(client.create_calls[-1]["model"], "gpt-5-nano")
         self.assertIn("reasoning_effort", client.create_calls[-1])
+
+    def test_failed_embedding_keeps_the_system_embedding(self):
+        client = FakeClient([["gpt-5-nano"]], [make_response("answer")], can_embed=False)
+        agent = make_agent(client)
+
+        self.assertEqual(agent.query("question"), "answer")
+        self.assert_history_restored(agent)
+
+    def test_empty_answer_counts_as_failure(self):
+        client = FakeClient([["gpt-5-nano"]], [make_response(None), make_response("")])
+        agent = make_agent(client)
+
+        self.assertIsNone(agent.query("first"))
+        self.assertIsNone(agent.query("second"))
+        self.assert_history_restored(agent)
+
+    def test_recognizes_reasoning_effort_rejection_without_param(self):
+        client = FakeClient(
+            [["gpt-4.1-nano"]],
+            [FakeBadRequestError("Unsupported parameter: 'reasoning_effort'"), make_response("answer")],
+        )
+        agent = make_agent(client)
+
+        self.assertEqual(agent.query("question"), "answer")
+        self.assertFalse(agent.can_set_reasoning_effort)
+
+    def test_context_trimming_does_not_remove_the_system_message(self):
+        client = FakeClient([["gpt-5-nano"]], [make_response("answer")])
+        agent = make_agent(client)
+        agent.max_tokens = 3  # "system prompt" is 2 tokens, so adding the query forces trimming
+
+        self.assertEqual(agent.query("a long question"), "answer")
+        self.assert_history_restored(agent)
 
 if __name__ == "__main__":
     unittest.main()

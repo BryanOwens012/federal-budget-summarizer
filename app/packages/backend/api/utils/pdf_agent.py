@@ -3,9 +3,8 @@ import openai
 import tiktoken
 import os
 from datetime import datetime
+from typing import Optional
 from utils.model_selector import fetch_cheapest_chat_model
-
-QUERY_FAILED_MESSAGE = "Failed to process query"
 
 # Reasoning models bill hidden reasoning tokens as output; keep them small for this summarization work
 REASONING_EFFORT = "low"
@@ -49,15 +48,18 @@ class PDFAgent:
         return text
 
     def _add_embedding(self, message):
-        """Create and store embedding for a single message"""
+        """Create and store embedding for a single message; returns it, or None if it could not be created"""
         try:
             response = self.client.embeddings.create(
                 input=message["content"],
                 model="text-embedding-3-large"
             )
-            self.embeddings.append(response.data[0].embedding)
+            embedding = response.data[0].embedding
+            self.embeddings.append(embedding)
+            return embedding
         except Exception as e:
             print(f"{datetime.now()} Error creating embedding: {e}")
+            return None
 
     def _manage_context(self):
         """Manage conversation context to stay within token limits"""
@@ -90,7 +92,7 @@ class PDFAgent:
                     reasoning_effort=REASONING_EFFORT,
                 )
             except openai.BadRequestError as e:
-                if e.param != "reasoning_effort":
+                if e.param != "reasoning_effort" and "reasoning_effort" not in str(e):
                     raise
                 print(f"{datetime.now()} Chat model {self.chat_model} rejected reasoning_effort; retrying without it")
                 self.can_set_reasoning_effort = False
@@ -107,32 +109,33 @@ class PDFAgent:
             self._select_chat_model()
             return self._request_chat_completion()
 
-    def query(self, user_query):
-        """Send query with PDF context"""
-        # Add user query to messages and create its embedding
+    def query(self, user_query) -> Optional[str]:
+        """Send query with PDF context. Returns None when the call fails or the model returns no text"""
         user_message = {
             "role": "user",
             "content": user_query
         }
         self.messages.append(user_message)
-        self._add_embedding(user_message)
-        
-        # Manage context tokens
-        self._manage_context()
-        
-        # Call OpenAI API
+        embedding = None
+
         try:
+            # Create the query's embedding and keep the context within token limits
+            embedding = self._add_embedding(user_message)
+            self._manage_context()
+
+            # Call OpenAI API and extract agent's response
             response = self._create_chat_completion()
-            
-            # Extract agent's response
-            return response.choices[0].message.content
-            
+            return response.choices[0].message.content or None
+
         except Exception as e:
             print(f"{datetime.now()} Error in API call: {type(e).__name__}: {e}")
-            return QUERY_FAILED_MESSAGE
+            return None
 
         finally:
-            # Remove the user message and its embedding, whether or not the call succeeded,
-            # so that future queries don't get confused by it.
-            self.messages.pop(-1)
-            self.embeddings.pop(-1)
+            # Remove this query's message and embedding, whether or not the call succeeded,
+            # so that future queries don't get confused by it. Matched by identity, since
+            # either may already be gone (embedding failed, or context trimming removed it).
+            if self.messages and self.messages[-1] is user_message:
+                self.messages.pop()
+            if embedding is not None and self.embeddings and self.embeddings[-1] is embedding:
+                self.embeddings.pop()
