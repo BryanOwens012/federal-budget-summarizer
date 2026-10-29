@@ -27,6 +27,22 @@ Since the OpenAI API doesn't have internet access, and the budget was passed aft
 - In `app/`, run `$ just up` (this calls `docker-compose` with a few options)
 - After the build completes, visit the app at `localhost:3000`
 
+### Deployment (Railway)
+
+The Railway project is Infrastructure as Code: `.railway/railway.ts` declares every service, database and variable, using the `railway/iac` DSL from the `railway` npm package (root `package.json`). Anything in Railway the file does not declare is deleted on apply, including each variable of a declared service.
+
+- Service variables hold no values. Each is an alias of the environment's shared variable of the same name (`ctx.shared.NAME`) or another resource's output (`postgres.env.DATABASE_URL`), so a value is edited once, in the shared variables. `.railway/railway-iac-contract.test.ts` refuses a literal value.
+- A service declares only the variables its code reads. When code starts reading a new one, create it in the shared variables and add it to the file before deploying.
+- A database image is compared by major version only; upgrade within a major from the dashboard.
+
+```sh
+npm install
+npm run typecheck:railway
+npm test
+# Read-only preview; works without `railway link`
+RAILWAY_PROJECT_ID=c5170fa7-f2a7-4415-8159-35c5f1a95855 RAILWAY_ENVIRONMENT_ID=224c8da9-6917-47e1-992a-b1786f5f20fe railway config plan
+```
+
 ### Motivation (Dec 2024)
 
 I've been interested in law for many years. These days, I keep up with legal news (such as cases involving SCOTUS or the U.S. government), read law school textbooks, and study the Series 65 and LSAT for fun.
