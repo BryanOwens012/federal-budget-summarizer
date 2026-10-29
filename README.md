@@ -8,7 +8,7 @@ There are 2 ways to access this app:
 
 I challenged myself to manually build this app from scratch to public deployment within a week. Fun!
 
-** This project involves no AI-generated code, except for dependency (security) updates **
+** This project involves minimal AI-generated code besides security- and dependency-related updates **
 
 ### Tech stack
 
