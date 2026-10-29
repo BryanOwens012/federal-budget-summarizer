@@ -1,0 +1,18 @@
+{
+  "name": "federal-budget-summarizer",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "typecheck:railway": "tsc -p .railway",
+    "test": "vitest run",
+    "railway:plan": "railway config plan --detailed-exit-code"
+  },
+  "devDependencies": {
+    "railway": "3.16.0",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
+  }
+}

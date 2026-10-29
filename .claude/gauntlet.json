@@ -1,0 +1,6 @@
+{
+  "checks": [
+    { "name": "typecheck-railway", "run": "npm run typecheck:railway" },
+    { "name": "railway-iac-contract", "run": "npm test" }
+  ]
+}
