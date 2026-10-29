@@ -31,7 +31,7 @@ The chat model is never hardcoded. On the first query, the API lists the models 
 
 ### Deployment (Railway)
 
-The Railway project is Infrastructure as Code: `.railway/railway.ts` declares every service, database and variable, using the `railway/iac` DSL from the `railway` npm package. The root `package.json` exists only for this tooling; the services build from their own directories. Anything in Railway the file does not declare is deleted on apply, including each variable of a declared service.
+The Railway project is Infrastructure as Code: `.railway/railway.ts` declares every service, database and variable, using the `railway/iac` DSL from the `railway` npm package. The root `package.json` exists only for this tooling; the services build from their own directories. Anything in Railway the file does not declare is deleted on apply (volumes excepted), including each variable of a declared service.
 
 - Service variables hold no values. Each is an alias of the environment's shared variable of the same name (`ctx.shared.NAME`) or another resource's same-named output (`postgres.env.DATABASE_URL`), so a value is edited once, in the shared variables. `.railway/railway-iac-contract.test.ts` refuses anything else.
 - A shared variable must exist before an apply that aliases it, or the service receives an empty string. `plan` cannot tell: it shows `preserve() → shared.NAME` either way.
