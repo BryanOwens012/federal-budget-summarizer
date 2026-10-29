@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 import os
-from utils.pdf_agent import PDFAgent
+from utils.pdf_agent import PDFAgent, QUERY_FAILED_MESSAGE
 from datetime import datetime
 import re
 from utils.lru_cache import LRUCache
@@ -33,12 +33,17 @@ pdf_agent = PDFAgent(
     max_tokens=30000, # This PDF has ≈24k words, which corresponds to ≈30k tokens.
 )
 
+def cache_unless_failed(cache: LRUCache, key: str, value: str):
+    """Never cache a failed query, or every later request for that key would get the failure back"""
+    if value != QUERY_FAILED_MESSAGE:
+        cache.set(key, value)
+
 async def init_summaries_by_state_cache():
     for us_state in mostLikelyUSStates:
         print(f"{datetime.now()} Pre-caching budget summaries for {us_state}")
 
         result = await get_budget_summaries(GetBudgetSummariesRequest(us_state=us_state))
-        summaries_by_us_state_cache.set(us_state, result)
+        cache_unless_failed(summaries_by_us_state_cache, us_state, result)
 
 async def init_elaboration_by_summary_cache():
     for us_state, summaries in summaries_by_us_state_cache.export():
@@ -47,7 +52,7 @@ async def init_elaboration_by_summary_cache():
         for summary in summaries.split(summaryDelimiter)[1:]:
             parsedSummary = summary.split(titleDelimiter)[0]
             result = await get_budget_elaboration(GetBudgetElaborationRequest(summary=parsedSummary))
-            elaboration_by_summary_cache.set(parsedSummary, result)
+            cache_unless_failed(elaboration_by_summary_cache, parsedSummary, result)
 
 async def init_caches():
     await init_summaries_by_state_cache()
@@ -112,7 +117,7 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
     """
 
     result = clean_result(pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}"))
-    summaries_by_us_state_cache.set(request.us_state, result)
+    cache_unless_failed(summaries_by_us_state_cache, request.us_state, result)
 
     print(f"{datetime.now()} Got budget summaries" + ('' if request.us_state == emptyUSState else f" for {request.us_state}"))
 
@@ -156,7 +161,7 @@ async def get_budget_elaboration(request: GetBudgetElaborationRequest):
     """
 
     result = clean_result(pdf_agent.query(f"{prompt_header}{prompt_summary}{prompt_footer}"))
-    elaboration_by_summary_cache.set(request.summary, result)
+    cache_unless_failed(elaboration_by_summary_cache, request.summary, result)
 
     print(f"{datetime.now()} Got budget elaboration for \"{summary_preview}...\"")
 

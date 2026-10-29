@@ -54,6 +54,9 @@ class SelectCheapestChatModelTest(unittest.TestCase):
         ids = ["gpt-5-nano-2025-08-07", "gpt-4o-mini-tts", "gpt-4o-mini-realtime-preview", "gpt-4o-mini"]
         self.assertIsNone(select_cheapest_chat_model(ids))
 
+    def test_rejects_ids_with_trailing_text(self):
+        self.assertIsNone(select_cheapest_chat_model(["gpt-5-nano\n", "gpt-5-nano-preview", "xgpt-5-nano"]))
+
     def test_returns_none_for_empty_list(self):
         self.assertIsNone(select_cheapest_chat_model([]))
 

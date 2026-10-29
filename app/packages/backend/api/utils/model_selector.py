@@ -7,7 +7,7 @@ TIER_PREFERENCE = ["nano", "mini", "luna"]
 # Undated chat-model aliases only, e.g. "gpt-5-nano" or "gpt-5.6-luna".
 # Excludes dated snapshots ("gpt-5-nano-2025-08-07") and special-purpose
 # variants ("gpt-4o-mini-tts", "gpt-4o-mini-realtime-preview").
-CHAT_MODEL_PATTERN = re.compile(rf"^gpt-(\d+)(?:\.(\d+))?-({'|'.join(TIER_PREFERENCE)})$")
+CHAT_MODEL_PATTERN = re.compile(rf"gpt-(\d+)(?:\.(\d+))?-({'|'.join(TIER_PREFERENCE)})")
 
 def select_cheapest_chat_model(model_ids: Iterable[str]) -> Optional[str]:
     """
@@ -20,7 +20,7 @@ def select_cheapest_chat_model(model_ids: Iterable[str]) -> Optional[str]:
     """
     candidates = []
     for model_id in model_ids:
-        match = CHAT_MODEL_PATTERN.match(model_id)
+        match = CHAT_MODEL_PATTERN.fullmatch(model_id)
         if match:
             major, minor, tier = match.groups()
             candidates.append((TIER_PREFERENCE.index(tier), -int(major), int(minor or 0), model_id))

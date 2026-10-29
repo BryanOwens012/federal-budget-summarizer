@@ -5,6 +5,11 @@ import os
 from datetime import datetime
 from utils.model_selector import fetch_cheapest_chat_model
 
+QUERY_FAILED_MESSAGE = "Failed to process query"
+
+# Reasoning models bill hidden reasoning tokens as output; keep them small for this summarization work
+REASONING_EFFORT = "low"
+
 class PDFAgent:
     def __init__(self, pdf_path, max_tokens=4000):
         self.client = openai.OpenAI(
@@ -13,6 +18,8 @@ class PDFAgent:
         
         # Chosen lazily on the first query, and re-chosen if OpenAI retires it
         self.chat_model = None
+        # Cleared when the chosen model rejects reasoning_effort (non-reasoning models do)
+        self.can_set_reasoning_effort = True
 
         self.pdf_text = self._extract_pdf_text(pdf_path)
         self.max_tokens = max_tokens
@@ -70,18 +77,35 @@ class PDFAgent:
 
     def _select_chat_model(self):
         self.chat_model = fetch_cheapest_chat_model(self.client)
+        self.can_set_reasoning_effort = True
         print(f"{datetime.now()} Using chat model: {self.chat_model}")
+
+    def _request_chat_completion(self):
+        """Call the chosen model, dropping reasoning_effort if the model does not accept it"""
+        if self.can_set_reasoning_effort:
+            try:
+                return self.client.chat.completions.create(
+                    model=self.chat_model,
+                    messages=self.messages,
+                    reasoning_effort=REASONING_EFFORT,
+                )
+            except openai.BadRequestError as e:
+                if e.param != "reasoning_effort":
+                    raise
+                print(f"{datetime.now()} Chat model {self.chat_model} rejected reasoning_effort; retrying without it")
+                self.can_set_reasoning_effort = False
+        return self.client.chat.completions.create(model=self.chat_model, messages=self.messages)
 
     def _create_chat_completion(self):
         """Call the cheapest available model, re-selecting once if it has been retired"""
         if self.chat_model is None:
             self._select_chat_model()
         try:
-            return self.client.chat.completions.create(model=self.chat_model, messages=self.messages)
+            return self._request_chat_completion()
         except openai.NotFoundError:
             print(f"{datetime.now()} Chat model {self.chat_model} not found; selecting another")
             self._select_chat_model()
-            return self.client.chat.completions.create(model=self.chat_model, messages=self.messages)
+            return self._request_chat_completion()
 
     def query(self, user_query):
         """Send query with PDF context"""
@@ -101,15 +125,14 @@ class PDFAgent:
             response = self._create_chat_completion()
             
             # Extract agent's response
-            agent_response = response.choices[0].message.content
+            return response.choices[0].message.content
             
-            # Now that we've extracted the response, remove the user message and its embedding,
+        except Exception as e:
+            print(f"{datetime.now()} Error in API call: {type(e).__name__}: {e}")
+            return QUERY_FAILED_MESSAGE
+
+        finally:
+            # Remove the user message and its embedding, whether or not the call succeeded,
             # so that future queries don't get confused by it.
             self.messages.pop(-1)
             self.embeddings.pop(-1)
-            
-            return agent_response
-            
-        except Exception as e:
-            print(f"{datetime.now()} Error in API call: {e}")
-            return "Failed to process query"
