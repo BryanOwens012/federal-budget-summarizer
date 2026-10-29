@@ -18,14 +18,16 @@ import program from "./railway.ts";
  */
 
 /**
- * Variables allowed to be something other than a same-named alias, such as `preserve()`. Empty:
- * every variable reads from the shared variables or from another resource. Add a name here only
- * for a variable that genuinely belongs to one service.
+ * Variables (`<service>.<NAME>`) allowed to be something other than a same-named alias, such as
+ * `preserve()`. Empty: every variable reads from the shared variables or from another resource.
+ * Add one here only for a variable that genuinely belongs to one service.
  */
 const NON_ALIAS_ALLOWLIST: readonly string[] = [];
 
 type Resource = { name: string; variables?: Record<string, unknown> };
 
+// The reference shapes are the `railway` package's own (pinned at 3.16.0); a change to them fails
+// every case below rather than passing silently.
 const isSameNamedAlias = (name: string, value: unknown): boolean => {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -45,7 +47,7 @@ describe(".railway/railway.ts references variables rather than valuing them", as
   const resources = (definition.resources ?? []) as Resource[];
   const entries = resources.flatMap((resource) =>
     Object.entries(resource.variables ?? {}).map(([name, value]) => ({
-      resource: resource.name,
+      label: `${resource.name}.${name}`,
       name,
       value,
     })),
@@ -54,15 +56,15 @@ describe(".railway/railway.ts references variables rather than valuing them", as
   // Guards the guard: if evaluation stopped producing variables, every rule below would pass on
   // nothing.
   it("finds the variables of both app services", () => {
-    const names = entries.map((e) => `${e.resource}.${e.name}`);
-    expect(names).toContain("rare-bravery.OPENAI_API_KEY");
-    expect(names).toContain("federal-budget-summarizer.NEXT_PUBLIC_API_URL");
+    const labels = entries.map((e) => e.label);
+    expect(labels).toContain("rare-bravery.OPENAI_API_KEY");
+    expect(labels).toContain("federal-budget-summarizer.NEXT_PUBLIC_API_URL");
   });
 
   it.each(entries)(
-    "$resource.$name is an alias of the same name",
-    ({ name, value }) => {
-      if (NON_ALIAS_ALLOWLIST.includes(name)) {
+    "$label is an alias of the same name",
+    ({ label, name, value }) => {
+      if (NON_ALIAS_ALLOWLIST.includes(label)) {
         return;
       }
       expect(isSameNamedAlias(name, value), JSON.stringify(value)).toBe(true);
