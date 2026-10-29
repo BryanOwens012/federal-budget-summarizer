@@ -1,72 +1,71 @@
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { createRailwayContext, project } from "railway/iac";
 import { describe, expect, it } from "vitest";
+import program from "./railway.ts";
 
 /**
  * The rule about `.railway/railway.ts` that nothing else can catch: no variable is written as a
  * value.
  *
- * Every entry is an alias of the environment's shared variable of the same name
- * (`ctx.shared.NAME`) or another resource's output (`postgres.env.DATABASE_URL`); `preserve()`,
- * which keeps whatever Railway holds, is refused unless the name is in PRESERVED_ALLOWLIST. Writing
- * the value instead replaces an alias with a copy that stops tracking what it copied, and every
- * tool renders references before printing, so the copy is indistinguishable from the alias in
- * `railway variable list`, in the Railway MCP, and in a `plan`. Nothing fails; the shared variable
- * simply stops reaching the service.
+ * Every variable is an alias of the environment's shared variable of the same name
+ * (`ctx.shared.NAME`) or the same-named output of another resource (`postgres.env.DATABASE_URL`).
+ * Writing the value instead replaces an alias with a copy that stops tracking what it copied, and
+ * every tool renders references before printing, so the copy is indistinguishable from the alias
+ * in `railway variable list`, in the Railway MCP, and in a `plan`. Nothing fails; the shared
+ * variable simply stops reaching the service.
+ *
+ * The test evaluates the program and checks the variables it produces, so a literal cannot hide
+ * behind formatting (a spread, a lowercase key, a computed name) the way it could from a text match.
  */
-
-const IAC_FILE = join(dirname(fileURLToPath(import.meta.url)), "railway.ts");
 
 /**
- * Env var names are SCREAMING_SNAKE_CASE, which no other object key in that file uses. Quoted keys
- * are matched too, so `'PORT': '3000'` cannot hide from the rule below.
+ * Variables allowed to be something other than a same-named alias, such as `preserve()`. Empty:
+ * every variable reads from the shared variables or from another resource. Add a name here only
+ * for a variable that genuinely belongs to one service.
  */
-const VARIABLE_ENTRY = /^\s*['"]?([A-Z][A-Z0-9_]*)['"]?:\s*(.+?),?\s*$/gm;
+const NON_ALIAS_ALLOWLIST: readonly string[] = [];
 
-/** Another resource's output, e.g. `postgres.env.DATABASE_URL`. */
-const RESOURCE_OUTPUT = /^[A-Za-z_$][\w$]*\.env\.[A-Z][A-Z0-9_]*$/;
+type Resource = { name: string; variables?: Record<string, unknown> };
 
-/**
- * Variables allowed to keep a value set on the service itself with `preserve()`. Empty: every
- * service variable reads from the environment's shared variables or from another resource. Add a
- * name here only for a variable that genuinely belongs to one service.
- */
-const PRESERVED_ALLOWLIST: readonly string[] = [];
+const isSameNamedAlias = (name: string, value: unknown): boolean => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const ref = value as { type?: unknown; name?: unknown; output?: unknown };
+  return (
+    (ref.type === "sharedReference" && ref.name === name) ||
+    (ref.type === "reference" && ref.output === name)
+  );
+};
 
-describe(".railway/railway.ts references variables rather than valuing them", () => {
-  // Comments quote examples like `ctx.shared.NAME` and can trail an entry; only code counts
-  const code = readFileSync(IAC_FILE, "utf8")
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/\/\/.*$/gm, "");
-  const entries = [...code.matchAll(VARIABLE_ENTRY)].map(([, name, value]) => ({
-    name,
-    value,
-  }));
+describe(".railway/railway.ts references variables rather than valuing them", async () => {
+  const definition = await program(
+    createRailwayContext({ environment: "production" }),
+    project,
+  );
+  const resources = (definition.resources ?? []) as Resource[];
+  const entries = resources.flatMap((resource) =>
+    Object.entries(resource.variables ?? {}).map(([name, value]) => ({
+      resource: resource.name,
+      name,
+      value,
+    })),
+  );
 
-  // Guards the guard: an entry the regex fails to see is exempt from every rule, so each place the
-  // file names a shared variable or a resource output must be one of the matched entries.
-  it("sees every variable entry", () => {
-    expect(entries.map((e) => e.name)).toContain("OPENAI_API_KEY");
-    const references =
-      code.match(/ctx\.shared\.[A-Z][A-Z0-9_]*|\b\w+\.env\.[A-Z][A-Z0-9_]*/g) ??
-      [];
-    const referencedByEntries = entries.filter((e) => e.value !== "preserve()");
-    expect(referencedByEntries.length).toBe(references.length);
+  // Guards the guard: if evaluation stopped producing variables, every rule below would pass on
+  // nothing.
+  it("finds the variables of both app services", () => {
+    const names = entries.map((e) => `${e.resource}.${e.name}`);
+    expect(names).toContain("rare-bravery.OPENAI_API_KEY");
+    expect(names).toContain("federal-budget-summarizer.NEXT_PUBLIC_API_URL");
   });
 
-  // A shared alias must name its own variable, so `FOO: ctx.shared.BAR` cannot slip through, and
-  // `preserve()` hides whether a variable is an alias or a copy, so it needs an explicit exception.
   it.each(entries)(
-    "$name reads from the shared variables or another resource",
+    "$resource.$name is an alias of the same name",
     ({ name, value }) => {
-      if (value === "preserve()") {
-        expect(PRESERVED_ALLOWLIST).toContain(name);
-      } else if (value.startsWith("ctx.shared.")) {
-        expect(value).toBe(`ctx.shared.${name}`);
-      } else {
-        expect(value).toMatch(RESOURCE_OUTPUT);
+      if (NON_ALIAS_ALLOWLIST.includes(name)) {
+        return;
       }
+      expect(isSameNamedAlias(name, value), JSON.stringify(value)).toBe(true);
     },
   );
 });

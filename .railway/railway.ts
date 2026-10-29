@@ -9,7 +9,9 @@
 // No variable value is written here. Each service variable is an alias of the
 // environment's shared variable of the same name (`ctx.shared.NAME` compiles to
 // `${{shared.NAME}}`) or another resource's output (`postgres.env.DATABASE_URL`),
-// so a value is edited once, in the shared variables.
+// so a value is edited once, in the shared variables. `railway variable list`
+// and the Railway MCP render references before printing, so an alias and a
+// copy look identical there; .railway/railway-iac-contract.test.ts refuses a copy.
 //
 // Docs: https://docs.railway.com/infrastructure-as-code
 import { database, defineRailway, github, project, service } from "railway/iac";
@@ -49,7 +51,8 @@ export default defineRailway((ctx) => {
       },
     },
     // Only the variables the API reads. A variable that is not listed is
-    // deleted from the service on apply.
+    // deleted from the service on apply. The RAILWAY_* variables main.py reads
+    // are injected by Railway into every service and need no entry.
     env: {
       BUDGET_PDF_PATH: ctx.shared.BUDGET_PDF_PATH,
       // utils/querier.py prefers DATABASE_PUBLIC_URL and falls back to DATABASE_URL.
@@ -73,6 +76,8 @@ export default defineRailway((ctx) => {
     networking: {
       serviceDomains: { "federal-budget-summarizer.up.railway.app": {} },
     },
+    // NEXT_PUBLIC_API_VERSION (pages/_app.tsx) is deliberately unset: the code
+    // defaults it to "v1".
     env: {
       NEXT_PUBLIC_API_URL: ctx.shared.NEXT_PUBLIC_API_URL,
       // `next start` listens on PORT, which the public domain routes to.
