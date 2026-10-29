@@ -3,6 +3,11 @@ import openai
 import tiktoken
 import os
 from datetime import datetime
+from typing import Optional
+from utils.model_selector import fetch_cheapest_chat_model
+
+# Reasoning models bill hidden reasoning tokens as output; keep them small for this summarization work
+REASONING_EFFORT = "low"
 
 class PDFAgent:
     def __init__(self, pdf_path, max_tokens=4000):
@@ -10,6 +15,11 @@ class PDFAgent:
             api_key = os.getenv("OPENAI_API_KEY")
         )
         
+        # Chosen lazily on the first query, and re-chosen if OpenAI retires it
+        self.chat_model = None
+        # Cleared when the chosen model rejects reasoning_effort (non-reasoning models do)
+        self.can_set_reasoning_effort = True
+
         self.pdf_text = self._extract_pdf_text(pdf_path)
         self.max_tokens = max_tokens
         
@@ -38,15 +48,18 @@ class PDFAgent:
         return text
 
     def _add_embedding(self, message):
-        """Create and store embedding for a single message"""
+        """Create and store embedding for a single message; returns it, or None if it could not be created"""
         try:
             response = self.client.embeddings.create(
                 input=message["content"],
                 model="text-embedding-3-large"
             )
-            self.embeddings.append(response.data[0].embedding)
+            embedding = response.data[0].embedding
+            self.embeddings.append(embedding)
+            return embedding
         except Exception as e:
             print(f"{datetime.now()} Error creating embedding: {e}")
+            return None
 
     def _manage_context(self):
         """Manage conversation context to stay within token limits"""
@@ -64,36 +77,65 @@ class PDFAgent:
             else:
                 break
 
-    def query(self, user_query):
-        """Send query with PDF context"""
-        # Add user query to messages and create its embedding
+    def _select_chat_model(self):
+        self.chat_model = fetch_cheapest_chat_model(self.client)
+        self.can_set_reasoning_effort = True
+        print(f"{datetime.now()} Using chat model: {self.chat_model}")
+
+    def _request_chat_completion(self):
+        """Call the chosen model, dropping reasoning_effort if the model does not accept it"""
+        if self.can_set_reasoning_effort:
+            try:
+                return self.client.chat.completions.create(
+                    model=self.chat_model,
+                    messages=self.messages,
+                    reasoning_effort=REASONING_EFFORT,
+                )
+            except openai.BadRequestError as e:
+                if e.param != "reasoning_effort" and "reasoning_effort" not in str(e):
+                    raise
+                print(f"{datetime.now()} Chat model {self.chat_model} rejected reasoning_effort; retrying without it")
+                self.can_set_reasoning_effort = False
+        return self.client.chat.completions.create(model=self.chat_model, messages=self.messages)
+
+    def _create_chat_completion(self):
+        """Call the cheapest available model, re-selecting once if it has been retired"""
+        if self.chat_model is None:
+            self._select_chat_model()
+        try:
+            return self._request_chat_completion()
+        except openai.NotFoundError:
+            print(f"{datetime.now()} Chat model {self.chat_model} not found; selecting another")
+            self._select_chat_model()
+            return self._request_chat_completion()
+
+    def query(self, user_query) -> Optional[str]:
+        """Send query with PDF context. Returns None when the call fails or the model returns no text"""
         user_message = {
             "role": "user",
             "content": user_query
         }
         self.messages.append(user_message)
-        self._add_embedding(user_message)
-        
-        # Manage context tokens
-        self._manage_context()
-        
-        # Call OpenAI API
+        embedding = None
+
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini-2024-07-18",
-                messages=self.messages,
-            )
-            
-            # Extract agent's response
-            agent_response = response.choices[0].message.content
-            
-            # Now that we've extracted the response, remove the user message and its embedding,
-            # so that future queries don't get confused by it.
-            self.messages.pop(-1)
-            self.embeddings.pop(-1)
-            
-            return agent_response
-            
+            # Create the query's embedding and keep the context within token limits
+            embedding = self._add_embedding(user_message)
+            self._manage_context()
+
+            # Call OpenAI API and extract agent's response
+            response = self._create_chat_completion()
+            return response.choices[0].message.content or None
+
         except Exception as e:
-            print(f"{datetime.now()} Error in API call: {e}")
-            return "Failed to process query"
+            print(f"{datetime.now()} Error in API call: {type(e).__name__}: {e}")
+            return None
+
+        finally:
+            # Remove this query's message and embedding, whether or not the call succeeded,
+            # so that future queries don't get confused by it. Matched by identity, since
+            # either may already be gone (embedding failed, or context trimming removed it).
+            if self.messages and self.messages[-1] is user_message:
+                self.messages.pop()
+            if embedding is not None and self.embeddings and self.embeddings[-1] is embedding:
+                self.embeddings.pop()

@@ -17,6 +17,8 @@ class GetBudgetElaborationRequest(BaseModel):
 emptyUSState = "-"
 mostLikelyUSStates = ["California", "Washington", "New York", "New Jersey", "Texas", "Florida", "Illinois", "Pennsylvania", "Virginia", "Maryland", "Massachusetts"]
 
+QUERY_FAILED_MESSAGE = "Failed to process query"
+
 summaryDelimiter = "summary>>"
 titleDelimiter = "title>>"
 cacheCapacity = 500
@@ -37,8 +39,8 @@ async def init_summaries_by_state_cache():
     for us_state in mostLikelyUSStates:
         print(f"{datetime.now()} Pre-caching budget summaries for {us_state}")
 
-        result = await get_budget_summaries(GetBudgetSummariesRequest(us_state=us_state))
-        summaries_by_us_state_cache.set(us_state, result)
+        # get_budget_summaries caches successful results itself
+        await get_budget_summaries(GetBudgetSummariesRequest(us_state=us_state))
 
 async def init_elaboration_by_summary_cache():
     for us_state, summaries in summaries_by_us_state_cache.export():
@@ -46,8 +48,8 @@ async def init_elaboration_by_summary_cache():
 
         for summary in summaries.split(summaryDelimiter)[1:]:
             parsedSummary = summary.split(titleDelimiter)[0]
-            result = await get_budget_elaboration(GetBudgetElaborationRequest(summary=parsedSummary))
-            elaboration_by_summary_cache.set(parsedSummary, result)
+            # get_budget_elaboration caches successful results itself
+            await get_budget_elaboration(GetBudgetElaborationRequest(summary=parsedSummary))
 
 async def init_caches():
     await init_summaries_by_state_cache()
@@ -111,7 +113,12 @@ async def get_budget_summaries(request: GetBudgetSummariesRequest):
         Don't add too much space or newlines between paragraphs.
     """
 
-    result = clean_result(pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}"))
+    answer = pdf_agent.query(f"{prompt_header}{prompt_state}{prompt_footer}")
+    if answer is None:
+        # Not cached, so the next request for this state tries again
+        return QUERY_FAILED_MESSAGE
+
+    result = clean_result(answer)
     summaries_by_us_state_cache.set(request.us_state, result)
 
     print(f"{datetime.now()} Got budget summaries" + ('' if request.us_state == emptyUSState else f" for {request.us_state}"))
@@ -155,7 +162,12 @@ async def get_budget_elaboration(request: GetBudgetElaborationRequest):
         Don't add too much space or newlines between paragraphs.
     """
 
-    result = clean_result(pdf_agent.query(f"{prompt_header}{prompt_summary}{prompt_footer}"))
+    answer = pdf_agent.query(f"{prompt_header}{prompt_summary}{prompt_footer}")
+    if answer is None:
+        # Not cached, so the next request for this summary tries again
+        return QUERY_FAILED_MESSAGE
+
+    result = clean_result(answer)
     elaboration_by_summary_cache.set(request.summary, result)
 
     print(f"{datetime.now()} Got budget elaboration for \"{summary_preview}...\"")
