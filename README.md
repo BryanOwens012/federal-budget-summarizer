@@ -18,6 +18,8 @@ I challenged myself to manually build this app from scratch to public deployment
 
 Since the OpenAI API doesn't have internet access, and the budget was passed after OpenAI's latest knowledge cutoff date, I tokenized the budget PDF and made embeddings with which to query the PDF.
 
+The chat model is never hardcoded. On the first query, the API lists the models available to its OpenAI key and picks the cheapest-looking small one (`app/packages/backend/api/utils/model_selector.py`): nano before mini before luna, then the newest major generation, then that generation's lowest point release (e.g. `gpt-5-nano`). If OpenAI later retires that model, the next call re-selects automatically. To make a new tier name eligible, add it to `TIER_PREFERENCE`. Run the selector's tests with `just test-api`.
+
 ### How to build
 
 - Install docker

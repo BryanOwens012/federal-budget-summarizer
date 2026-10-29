@@ -3,6 +3,7 @@ import openai
 import tiktoken
 import os
 from datetime import datetime
+from utils.model_selector import fetch_cheapest_chat_model
 
 class PDFAgent:
     def __init__(self, pdf_path, max_tokens=4000):
@@ -10,6 +11,9 @@ class PDFAgent:
             api_key = os.getenv("OPENAI_API_KEY")
         )
         
+        # Chosen lazily on the first query, and re-chosen if OpenAI retires it
+        self.chat_model = None
+
         self.pdf_text = self._extract_pdf_text(pdf_path)
         self.max_tokens = max_tokens
         
@@ -64,6 +68,21 @@ class PDFAgent:
             else:
                 break
 
+    def _select_chat_model(self):
+        self.chat_model = fetch_cheapest_chat_model(self.client)
+        print(f"{datetime.now()} Using chat model: {self.chat_model}")
+
+    def _create_chat_completion(self):
+        """Call the cheapest available model, re-selecting once if it has been retired"""
+        if self.chat_model is None:
+            self._select_chat_model()
+        try:
+            return self.client.chat.completions.create(model=self.chat_model, messages=self.messages)
+        except openai.NotFoundError:
+            print(f"{datetime.now()} Chat model {self.chat_model} not found; selecting another")
+            self._select_chat_model()
+            return self.client.chat.completions.create(model=self.chat_model, messages=self.messages)
+
     def query(self, user_query):
         """Send query with PDF context"""
         # Add user query to messages and create its embedding
@@ -79,10 +98,7 @@ class PDFAgent:
         
         # Call OpenAI API
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini-2024-07-18",
-                messages=self.messages,
-            )
+            response = self._create_chat_completion()
             
             # Extract agent's response
             agent_response = response.choices[0].message.content
